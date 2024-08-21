@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 import '../../../../../../core/core/widget/blur_widget.dart';
+import '../../../../../../core/routes/route_name.dart';
+import '../../../../../../core/routes/router.dart';
 import '../../../../../../core/utils/appStyle.dart';
 import '../../../../../../core/utils/app_assets.dart';
 import '../../../../../../core/utils/app_colors.dart';
@@ -147,7 +149,9 @@ class SignupScreen extends StatelessWidget {
                         CustomElevatedButton(
                           hexColor: HexColor('#072844'),
                           text: "Sign up",
-                          onPress: () {},
+                          onPress: () {
+
+                          },
                         ),
                         10.ph,
                         CustomRichText(
@@ -160,7 +164,7 @@ class SignupScreen extends StatelessWidget {
                           headingFontWeight: FontWeight.w500,
                           headingTextColor: AppColors.slightBlue,
                           onPress: (){
-                            // RouteGenerator.pushNamedAndRemoveAll(context, Routes.signInPage);
+                            RouteGenerator.pushNamed(context, Routes.signInPage);
                           },
                         )
                       ],
