@@ -9,7 +9,7 @@ class CustomCachedImageNetwork extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-      imageUrl: "https://static.vecteezy.com/system/resources/thumbnails/041/714/266/small_2x/ai-generated-professional-man-in-suit-with-arms-crossed-on-transparent-background-stock-png.png",
+      imageUrl: imageUrl,
       imageBuilder: (context, imageProvider) => Container(
         height: height,
         width: weight,

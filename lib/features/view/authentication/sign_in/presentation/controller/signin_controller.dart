@@ -38,7 +38,7 @@ class SigninController extends GetxController {
           LoginWithIdPassUseCase(locator<SignInRepository>());
       UserInfoPassUseCase userinfoUseCase =
           UserInfoPassUseCase(locator<SignInRepository>());
-      if (emailController.value.text.isEmpty) {
+      if (emailController.value.text.isEmpty && (session.getEmail?.isEmpty ?? false)) {
         errorToast(context: context, msg: "Please enter email");
       } else if (passwordController.value.text.isEmpty) {
         errorToast(context: context, msg: "Please enter password");
@@ -46,8 +46,8 @@ class SigninController extends GetxController {
         isLoading.value = true;
         update();
         var response = await loginUseCase(
-            userName: emailController.value.text,
-            password: passwordController.value.text);
+            userName: session.getEmail ?? emailController.value.text,
+            password: session.getPassword ?? passwordController.value.text);
         print("this is data of login ${response?.data?.message}");
         if (response?.data != null) {
           session.createSession(response?.data,

@@ -19,4 +19,5 @@ class AppAssets {
   static const String categoryIcon = 'assets/category_icon.png';
   static const String allProductIcon = 'assets/all_product_icon.png';
   static const String NOT_FOUND_IMAGE = 'assets/empty.png';
+  static const String aveterImage = 'assets/aveter.jpg';
 }

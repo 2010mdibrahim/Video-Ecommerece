@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-
-import '../../../../widget/gridview_widget/custom_gridview.dart';
+import '../widget/product_category_widget.dart';
 
 class AllProductScreen extends StatelessWidget {
   AllProductScreen({super.key});
@@ -124,8 +123,8 @@ class AllProductScreen extends StatelessWidget {
                       child: TabBarView(
                         children: [
                           // Content for the first tab
-                          HomePage(),
-                          HomePage(),
+                          ProductCategoryWidget(),
+                          ProductCategoryWidget(),
                         ],
                       ),
                     ),

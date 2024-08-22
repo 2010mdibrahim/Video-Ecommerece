@@ -1,59 +1,31 @@
-import 'dart:io';
-
 import 'package:e_commerce/core/source/pref_manager.dart';
 import 'package:e_commerce/features/view/authentication/sign_in/data/model/user_info_model.dart';
-
 import '../../features/view/authentication/sign_in/data/model/login_model.dart';
 
-
-
 class SessionManager {
-  Future<bool> createSession(LoginModel? loginModelData, { String? phoneNumber,  String? password}) async {
+  Future<bool> createSession(LoginModel? loginModelData, {String? phoneNumber,  String? password}) async {
     print("this is session ${loginModelData?.token}");
     try {
-      // if(loginModelData?.type == "employee"){
-      //   setFullName = loginModelData?.candidate?.fullName;
-      //   setPassword = password;
-      //   setPhoneNumber = phoneNumber;
-      //   setPhoto = loginModelData?.candidate?.avaterPhoto;
-      // }else{
-      print("this is session ${loginModelData?.token}");
         setToken = loginModelData?.token;
-        // setPhoto = loginModelData?.candidate?.candidatePhoto;
-      // }
-      // print(loginModelData?.candidate?.id);
+        setPassword = password;
       return true;
     } catch (e) {
       return false;
     }
   }
-  Future<bool> createUserSession(UserInformationModel? userInfo, { String? phoneNumber,  String? password}) async {
-    print("this is session ${userInfo?.name}");
+  Future<bool> createUserSession(UserInformationModel? userInfo, {String? phoneNumber,  String? password}) async {
     try {
-      // if(loginModelData?.type == "employee"){
-      //   setFullName = loginModelData?.candidate?.fullName;
-      //   setPassword = password;
-      //   setPhoneNumber = phoneNumber;
-      //   setPhoto = loginModelData?.candidate?.avaterPhoto;
-      // }else{
-      print("this is session ${userInfo?.name}");
         setFullName = userInfo?.name;
         setEmail = userInfo?.email;
         setPhoneNumber = phoneNumber;
-        // setPhoto = loginModelData?.candidate?.candidatePhoto;
-      // }
-      // print(loginModelData?.candidate?.id);
       return true;
     } catch (e) {
       return false;
     }
   }
 
-
   final PrefManager _prefManager;
-
   SessionManager(this._prefManager);
-
   String? get getFullName =>
       _prefManager.getStringValue("fullName");
   set setFullName(String? value) => _prefManager.saveString(

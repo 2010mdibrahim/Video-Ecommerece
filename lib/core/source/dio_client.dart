@@ -44,6 +44,7 @@ class DioClient {
         if (response.data != null) {
           logger.i("dio response $response");
           logger.i("dio response111 ${response.data}");
+
           responseCallback(response.data, response.statusMessage);
         } else {
           failureCallback(response.statusMessage, response.statusCode);
@@ -145,7 +146,7 @@ class DioClient {
     required String path,
     required Function(dynamic, String?) responseCallback,
     required Function(String?, int?) failureCallback,
-    Map<String, Object>? queryParameters, required bool isNeedToken,
+    Map<String, Object>? queryParameters,  bool? isNeedToken,
   }) async {
     Response? response;
     var connectivityResult = await (Connectivity().checkConnectivity());

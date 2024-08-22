@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/core/core/extensions/extensions.dart';
+import 'package:e_commerce/core/source/dio_client.dart';
 import 'package:e_commerce/core/utils/appStyle.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/core/utils/app_colors.dart';
@@ -204,6 +205,7 @@ class Homepage extends StatelessWidget {
                   Expanded(
                     child: CustomRow(
                       onPress: (){
+                        print(session.getToken);
                         RouteGenerator.pushNamed(context, Routes.allProducts);
                       },
                       title: "All Product",

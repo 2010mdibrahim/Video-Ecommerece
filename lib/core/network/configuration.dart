@@ -1,7 +1,9 @@
 class NetworkConfiguration {
   static const String baseUrl = "http://erp.mahfuza-overseas.com/trending-house/api/";
+  static const String reg = "register";
   static const String login = "login";
   static const String userInformation = "user";
+  static const String productCategory = "product-category";
   static const int success = 0;
   static const String successs = "Status.success";
   static const int error = 1;

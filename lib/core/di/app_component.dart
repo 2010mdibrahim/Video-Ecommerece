@@ -1,5 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:e_commerce/features/view/all_product/data/repository/product_category_repository_impl.dart';
+import 'package:e_commerce/features/view/all_product/data/source/product_category_service.dart';
+import 'package:e_commerce/features/view/all_product/domain/repository/product_category_repository.dart';
+import 'package:e_commerce/features/view/all_product/presentation/controller/all_product_controller.dart';
 import 'package:e_commerce/features/view/authentication/sign_in/presentation/controller/signin_controller.dart';
+import 'package:e_commerce/features/view/authentication/signup_screen/data/repository/reg_repository_impl.dart';
+import 'package:e_commerce/features/view/authentication/signup_screen/data/source/reg_service.dart';
+import 'package:e_commerce/features/view/authentication/signup_screen/domain/repository/reg_repository.dart';
+import 'package:e_commerce/features/view/authentication/signup_screen/presentation/controller/signup_controller.dart';
 import 'package:e_commerce/features/view/splash_screen/presentation/controller/splash_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -22,6 +30,16 @@ Future<void> init() async {
   locator.registerFactory<SignInService>(() => SignInService());
   locator.registerFactory<SignInRepository>(
       () => SignInRepositoryImpl(locator<SignInService>()));
+  //sign up
+  locator.registerFactory<SignupController>(() => Get.put(SignupController()));
+  locator.registerFactory<RegService>(() => RegService());
+  locator.registerFactory<RegRepository>(
+      () => RegRepositoryImpl(locator<RegService>()));
+  //Product Category
+  locator.registerFactory<AllProductController>(() => Get.put(AllProductController()));
+  locator.registerFactory<ProductCategoryService>(() => ProductCategoryService());
+  locator.registerFactory<ProductCategoryRepository>(
+      () => ProductCategoryRepositoryImpl(locator<ProductCategoryService>()));
 
 
 //splash screen controller
