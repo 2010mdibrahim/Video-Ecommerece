@@ -2,6 +2,7 @@ import 'package:e_commerce/core/routes/route_name.dart';
 import 'package:e_commerce/features/view/all_product/presentation/view/all_product_screen.dart';
 import 'package:e_commerce/features/view/homepage/presentation/view/homepage.dart';
 import 'package:flutter/material.dart';
+import '../../features/view/all_product/presentation/view/product_category_wise.dart';
 import '../../features/view/authentication/sign_in/presentation/view/sign_in_page.dart';
 import '../../features/view/authentication/signup_screen/presentation/view/signup_screen.dart';
 import '../../features/view/splash_screen/presentation/view/splash_screen.dart';
@@ -100,6 +101,10 @@ class RouteGenerator {
         case Routes.allProducts:
         return MaterialPageRoute(
           builder: (context) =>  AllProductScreen(),
+        );
+        case Routes.productCategoryWise:
+        return MaterialPageRoute(
+          builder: (context) =>  ProductDetailsScreen(),
         );
 
 

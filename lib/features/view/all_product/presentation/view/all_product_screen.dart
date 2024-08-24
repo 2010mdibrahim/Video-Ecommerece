@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import '../widget/all_products_widget.dart';
 import '../widget/product_category_widget.dart';
 
 class AllProductScreen extends StatelessWidget {
@@ -124,7 +125,7 @@ class AllProductScreen extends StatelessWidget {
                         children: [
                           // Content for the first tab
                           ProductCategoryWidget(),
-                          ProductCategoryWidget(),
+                          AllProductsWidget(),
                         ],
                       ),
                     ),

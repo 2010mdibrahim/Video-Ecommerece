@@ -13,6 +13,8 @@ import '../../../../../../core/source/session_manager.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../model/product_category_model.dart';
 import 'package:dio/dio.dart' as dio;
+
+import '../model/product_category_wise_product_model.dart';
 var session = locator<SessionManager>();
 
 class ProductCategoryService {
@@ -38,6 +40,44 @@ class ProductCategoryService {
           // Handle the case where the response is not a list (optional)
           apiResponse = Response.error("Unexpected response format", null);
         }
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+
+  Future<Response<ProductCategoryWiseProductModel?>?> productCategoryWiseProductPass() async {
+    Response<ProductCategoryWiseProductModel?>? apiResponse;
+
+    await _dioClient.get(
+      path: NetworkConfiguration.productCategoryWiseProduct,
+      responseCallback: (response, message) {
+        var products = ProductCategoryWiseProductModel.fromJson(response);
+          apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<ProductCategoryWiseProductModel?>?> productDetailsPass({required Map<String, Object> data}) async {
+    Response<ProductCategoryWiseProductModel?>? apiResponse;
+
+    await _dioClient.get(
+      path: NetworkConfiguration.productCategoryWiseProduct,
+      queryParameters: data,
+      responseCallback: (response, message) {
+        var products = ProductCategoryWiseProductModel.fromJson(response);
+          apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {
         print("this is message error $message $status");
