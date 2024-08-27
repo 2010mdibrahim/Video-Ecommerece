@@ -6,14 +6,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/di/app_component.dart';
+import '../../../../../core/routes/route_name.dart';
+import '../../../../../core/routes/router.dart';
+import '../../../../../main.dart';
+import '../../data/model/product_category_wise_item_details.dart';
 import '../../data/model/product_category_wise_product_model.dart';
 
 class AllProductController extends GetxController{
   var isSelected = 0.obs;
   var isLoading = false.obs;
   var isAllProductLoading = false.obs;
+  var isProductDetailsLoading = false.obs;
   var productCategoryList = <ProductCategoryModel>[].obs;
+  var productCategoryProductList = <ProductCategoryModel>[].obs;
   var productCategoryWiseProductModel = ProductCategoryWiseProductModel().obs;
+  var productCategoryWiseProductModell = ProductCategoryWiseProductModel().obs;
+  var productCategoryWiseProductDetailsModel = ProductCategoryWiseItemDetails().obs;
   @override
   void onInit() {
     productCategory();
@@ -62,17 +70,39 @@ class AllProductController extends GetxController{
       isAllProductLoading.value = false;
     }
   }
+  productCategoryDetails({required String itemName}) async {
+    try {
+      isProductDetailsLoading.value = true;
+      ProductCategoryWiseItemDetailsPassUseCase productCategoryUseCase =
+      ProductCategoryWiseItemDetailsPassUseCase(locator<ProductCategoryRepository>());
+      var response = await productCategoryUseCase(itemName: itemName);
+      print("All products ${response?.data.runtimeType}");
+      if (response?.data != null && response?.data is ProductCategoryWiseItemDetails) {
+        print("This is product category");
+        productCategoryWiseProductDetailsModel.value = response?.data ?? ProductCategoryWiseItemDetails();
+        RouteGenerator.pushNamed(
+            navigatorKey.currentContext!, Routes.productCategoryItemDetailsWise);
+        print("productCategoryList.first.name ${productCategoryList.first.name}");
+      } else {
+        print('No data found');
+      }
+    } catch (e) {
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isProductDetailsLoading.value = false;
+    }
+  }
 
-  productDetails({required Map<String, Object> data}) async {
+  categoryWiseProductItems({required Map<String, Object> data}) async {
     try {
       isAllProductLoading.value = true;
-      productDetailsPassUseCase productCategoryUseCase =
-      productDetailsPassUseCase(locator<ProductCategoryRepository>());
+      ProductCategoryWiseItemPassUseCase productCategoryUseCase =
+      ProductCategoryWiseItemPassUseCase(locator<ProductCategoryRepository>());
       var response = await productCategoryUseCase(data: data);
       print("All products ${response?.data.runtimeType}");
       if (response?.data != null && response?.data is ProductCategoryWiseProductModel) {
         print("This is product full list");
-        productCategoryWiseProductModel.value = response?.data ?? ProductCategoryWiseProductModel();
+        productCategoryWiseProductModell.value = response?.data ?? ProductCategoryWiseProductModel();
         print("productCategoryList.first.name ${productCategoryList.first.name}");
       } else {
         print('No data found');

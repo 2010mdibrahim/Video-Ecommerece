@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 class CustomCachedImageNetwork extends StatelessWidget {
   final String imageUrl;
   final double height, weight;
-  const CustomCachedImageNetwork({super.key, required this.imageUrl, required this.height, required this.weight});
+  final BoxFit? boxfit;
+  const CustomCachedImageNetwork({super.key, required this.imageUrl, required this.height, required this.weight, this.boxfit});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class CustomCachedImageNetwork extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
               image: imageProvider,
-              fit: BoxFit.cover,
+              fit: boxfit ?? BoxFit.fill,
               colorFilter:
               ColorFilter.mode(Colors.white, BlendMode.colorBurn)),
         ),

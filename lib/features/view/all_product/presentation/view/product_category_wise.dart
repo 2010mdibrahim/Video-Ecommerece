@@ -3,6 +3,7 @@ import 'package:e_commerce/features/widget/custom_appbar/custom_appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_colors.dart';
+import '../widget/category_wise_products.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({super.key});
@@ -17,7 +18,7 @@ class ProductDetailsScreen extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
-      body: AllProductsWidget(),
+      body: CategoryWiseProducts(),
     );
   }
 }

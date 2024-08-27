@@ -5,5 +5,6 @@ class Routes {
   static const homepage = "/homepage";
   static const allProducts = "/allProducts";
   static const productCategoryWise = "/productCategoryWise";
+  static const productCategoryItemDetailsWise = "/productCategoryItemDetailsWise";
 
 }

@@ -14,6 +14,7 @@ import '../../../../../../core/utils/constants.dart';
 import '../model/product_category_model.dart';
 import 'package:dio/dio.dart' as dio;
 
+import '../model/product_category_wise_item_details.dart';
 import '../model/product_category_wise_product_model.dart';
 var session = locator<SessionManager>();
 
@@ -69,7 +70,7 @@ class ProductCategoryService {
     logger.e("api response ${apiResponse?.data}");
     return apiResponse;
   }
-  Future<Response<ProductCategoryWiseProductModel?>?> productDetailsPass({required Map<String, Object> data}) async {
+  Future<Response<ProductCategoryWiseProductModel?>?> productCategoryWiseItemPass({required Map<String, Object> data}) async {
     Response<ProductCategoryWiseProductModel?>? apiResponse;
 
     await _dioClient.get(
@@ -77,6 +78,25 @@ class ProductCategoryService {
       queryParameters: data,
       responseCallback: (response, message) {
         var products = ProductCategoryWiseProductModel.fromJson(response);
+          apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<ProductCategoryWiseItemDetails?>?> productCategoryWiseItemDetailsPass({required String itemName}) async {
+    Response<ProductCategoryWiseItemDetails?>? apiResponse;
+    await _dioClient.get(
+      path: NetworkConfiguration.productCategoryWiseItemDetails + itemName,
+      // queryParameters: data,
+      responseCallback: (response, message) {
+        var products = ProductCategoryWiseItemDetails.fromJson(response);
+        print("this is products details ${products.itemDetail?.name}");
           apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {

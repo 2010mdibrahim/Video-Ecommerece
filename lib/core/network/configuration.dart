@@ -5,6 +5,7 @@ class NetworkConfiguration {
   static const String userInformation = "user";
   static const String productCategory = "product-category";
   static const String productCategoryWiseProduct = "products";
+  static const String productCategoryWiseItemDetails = "item/";
   static const int success = 0;
   static const String successs = "Status.success";
   static const int error = 1;

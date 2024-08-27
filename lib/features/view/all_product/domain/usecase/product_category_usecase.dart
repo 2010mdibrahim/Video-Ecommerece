@@ -10,9 +10,14 @@ abstract class ProductCategoryWiseProductUseCase {
 
   ProductCategoryWiseProductUseCase(this.productCategoryRepository);
 }
-abstract class productDetailsUseCase {
+abstract class ProductCategoryWiseItemUseCase {
   final ProductCategoryRepository productCategoryRepository;
 
-  productDetailsUseCase(this.productCategoryRepository);
+  ProductCategoryWiseItemUseCase(this.productCategoryRepository);
+}
+abstract class ProductCategoryWiseItemDetailsUseCase {
+  final ProductCategoryRepository productCategoryRepository;
+
+  ProductCategoryWiseItemDetailsUseCase(this.productCategoryRepository);
 }
 

@@ -14,35 +14,33 @@ import 'package:get/get.dart';
 import '../../../../../core/routes/route_name.dart';
 import '../../../../../core/routes/router.dart';
 import '../../../../../main.dart';
+import '../../data/model/product_category_wise_product_model.dart';
 
-class ProductCategoryWidget extends StatelessWidget {
+class CategoryWiseProducts extends StatelessWidget {
   var controller = locator<AllProductController>();
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AllProductController>(
         init: AllProductController(),
+        initState: (c) {
+          c.controller?.productCategoryWiseProduct();
+        },
         builder: (c) {
           return Obx(
-            () => Padding(
+                () => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: controller.isLoading.value ? Center(child: CircularProgressIndicator(),) : MasonryGridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 5,
-                itemCount: controller.productCategoryList.length,
+                itemCount: controller.productCategoryWiseProductModell.value.products?.data?.length,
                 crossAxisSpacing: 8,
                 itemBuilder: (context, index) {
-                  var item = controller.productCategoryList[index];
+                  var item = controller.productCategoryWiseProductModell.value.products?.data?[index];
                   print(
-                      "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/categories/${item.image ?? ''}");
+                      "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/thumbnails/${item?.thumbnail ?? ''}");
                   return InkWell(
                     onTap: (){
-                      var data = {
-                        "cat_id" : item.id.toString(),
-                      };
-                      controller.categoryWiseProductItems(data: data).then((value){
-                        RouteGenerator.pushNamed(
-                            navigatorKey.currentContext!, Routes.productCategoryWise);
-                      });
+                      controller.productCategoryDetails(itemName: item?.slug ?? '');
                     },
                     child: Stack(
                       children: [
@@ -52,12 +50,12 @@ class ProductCategoryWidget extends StatelessWidget {
                           top: 10,
                           child: Padding(
                             padding:
-                                EdgeInsets.only(top: (index) % 2 == 0 ? 0 : 20),
+                            EdgeInsets.only(top: (index) % 2 == 0 ? 0 : 20),
                             child: Transform.rotate(
                               angle: 20 * 3.1415926535897932 / 180,
                               child: CustomCachedImageNetwork(
                                   imageUrl:
-                                      "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/categories/${item.image ?? ''}",
+                                  "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/thumbnails/${item?.thumbnail ?? ''}",
                                   height: AppSizes.size42,
                                   weight: AppSizes.size42),
                             ),
@@ -77,7 +75,7 @@ class ProductCategoryWidget extends StatelessWidget {
 class Tile extends StatelessWidget {
   final int index;
   final double extent;
-  final ProductCategoryModel item;
+  final Data? item;
 
   Tile({required this.index, required this.extent, required this.item});
 
@@ -104,9 +102,14 @@ class Tile extends StatelessWidget {
             ),
             child: Padding(
               padding: EdgeInsets.only(bottom: 20),
-              child: CustomSimpleText(
-                text: item.name ?? '',
-                alignment: Alignment.bottomCenter,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: CustomSimpleText(
+                    text: item?.name ?? '',
+                    alignment: Alignment.bottomCenter,
+                  ),
+                ),
               ),
             ),
           ),

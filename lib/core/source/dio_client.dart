@@ -150,6 +150,7 @@ class DioClient {
   }) async {
     Response? response;
     var connectivityResult = await (Connectivity().checkConnectivity());
+    print("the url is ${NetworkConfiguration.baseUrl + path}");
     try {
       if (connectivityResult.contains(ConnectivityResult.mobile) ||
           connectivityResult.contains(ConnectivityResult.wifi)) {
