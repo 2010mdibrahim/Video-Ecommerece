@@ -15,6 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/view/authentication/sign_in/data/repository/login_repository_impl.dart';
 import '../../features/view/authentication/sign_in/data/source/login_service.dart';
 import '../../features/view/authentication/sign_in/domain/repository/login_repository.dart';
+import '../../features/view/my_video_screen/data/repository/my_video_repository_impl.dart';
+import '../../features/view/my_video_screen/data/source/my_video_service.dart';
+import '../../features/view/my_video_screen/domain/repository/my_video_repository.dart';
+import '../../features/view/my_video_screen/presentation/controller/my_video_controller.dart';
 import '../source/dio_client.dart';
 import '../source/pref_manager.dart';
 import '../source/session_manager.dart';
@@ -40,6 +44,11 @@ Future<void> init() async {
   locator.registerFactory<ProductCategoryService>(() => ProductCategoryService());
   locator.registerFactory<ProductCategoryRepository>(
       () => ProductCategoryRepositoryImpl(locator<ProductCategoryService>()));
+  //my video
+  locator.registerFactory<MyVideoController>(() => Get.put(MyVideoController()));
+  locator.registerFactory<MyVideoService>(() => MyVideoService());
+  locator.registerFactory<MyVideoRepository>(
+      () => MyVideoRepositoryImpl(locator<MyVideoService>()));
 
 
 //splash screen controller

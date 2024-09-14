@@ -9,7 +9,8 @@ class CustomSimpleText extends StatelessWidget {
   final double? fontSize;
   final TextAlign? textAlign;
   final AlignmentGeometry? alignment;
-  const CustomSimpleText({super.key, required this.text, this.color, this.fontWeight, this.fontSize, this.textAlign, this.alignment});
+  final int? maxLines;
+  const CustomSimpleText({super.key, required this.text, this.color, this.fontWeight, this.fontSize, this.textAlign, this.alignment, this.maxLines});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class CustomSimpleText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerLeft,
       child: Text(
         text,
-        maxLines: 2,
+        maxLines: maxLines ?? 2,
         textAlign: textAlign ?? TextAlign.start,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.podkova(

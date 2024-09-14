@@ -40,7 +40,7 @@ class SigninController extends GetxController {
           UserInfoPassUseCase(locator<SignInRepository>());
       if (emailController.value.text.isEmpty && (session.getEmail?.isEmpty ?? false)) {
         errorToast(context: context, msg: "Please enter email");
-      } else if (passwordController.value.text.isEmpty) {
+      } else if (passwordController.value.text.isEmpty && (session.getPassword?.isEmpty ?? false)) {
         errorToast(context: context, msg: "Please enter password");
       } else {
         isLoading.value = true;
@@ -59,7 +59,9 @@ class SigninController extends GetxController {
           print("user info model $userInfo");
           RouteGenerator.pushNamedAndRemoveAll(context, Routes.homepage);
           if (!context.mounted) return;
+          if((session.getEmail?.isEmpty ?? false) && (session.getPassword?.isEmpty ?? false)){
           successToast(context: context, msg: response?.data?.message ?? '');
+          }
         } else {
           if (!context.mounted) return;
           if (response?.data?.status == null) {

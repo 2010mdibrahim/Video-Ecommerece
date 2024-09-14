@@ -93,6 +93,9 @@ class Homepage extends StatelessWidget {
                       title: "Wallet",
                       icon: AppAssets.wallet,
                       titleColor: HexColor("8C632A"),
+                      onPress: (){
+                        RouteGenerator.pushNamed(context, Routes.wallet);
+                      },
                     ),
                   ),
                   20.pw,
@@ -179,6 +182,9 @@ class Homepage extends StatelessWidget {
                       title: "My Video",
                       icon: AppAssets.myVideo,
                       titleColor: HexColor("324F5F"),
+                      onPress: (){
+                        RouteGenerator.pushNamed(context, Routes.myVideo);
+                      },
                     ),
                   ),
                   20.pw,
@@ -196,6 +202,9 @@ class Homepage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomRow(
+                      onPress: (){
+                        RouteGenerator.pushNamed(context, Routes.sendMoney);
+                      },
                       title: "Send Money",
                       icon: AppAssets.sendMoney,
                       titleColor: HexColor("171D8F"),

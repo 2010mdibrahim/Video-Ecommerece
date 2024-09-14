@@ -50,7 +50,7 @@ class CategoryWiseProducts extends StatelessWidget {
                           top: 10,
                           child: Padding(
                             padding:
-                            EdgeInsets.only(top: (index) % 2 == 0 ? 0 : 20),
+                            EdgeInsets.only(top: (index) % 2 == 0 ? 15 : 30, right: 20),
                             child: Transform.rotate(
                               angle: 20 * 3.1415926535897932 / 180,
                               child: CustomCachedImageNetwork(
@@ -82,7 +82,7 @@ class Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: (index) % 2 == 0 ? 60 : 40),
+      padding: EdgeInsets.only(top: (index) % 2 == 0 ? 70 : 50),
       child: Padding(
         padding: const EdgeInsets.only(top: 0, left: 10, right: 10),
         child: Align(
@@ -108,6 +108,7 @@ class Tile extends StatelessWidget {
                   child: CustomSimpleText(
                     text: item?.name ?? '',
                     alignment: Alignment.bottomCenter,
+                    maxLines: 1,
                   ),
                 ),
               ),

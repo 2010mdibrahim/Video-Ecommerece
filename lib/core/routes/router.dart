@@ -6,7 +6,11 @@ import '../../features/view/all_product/presentation/view/product_category_wise.
 import '../../features/view/all_product/presentation/view/product_details_page.dart';
 import '../../features/view/authentication/sign_in/presentation/view/sign_in_page.dart';
 import '../../features/view/authentication/signup_screen/presentation/view/signup_screen.dart';
+import '../../features/view/my_video_screen/presentation/view/my_video_screen.dart';
+import '../../features/view/send_money_screen/presentation/view/send_money_screen.dart';
+import '../../features/view/send_money_screen/presentation/view/transfer_money_history.dart';
 import '../../features/view/splash_screen/presentation/view/splash_screen.dart';
+import '../../features/view/wallet_screen/presentation/view/wallet_screen.dart';
 
 
 class RouteGenerator {
@@ -110,6 +114,22 @@ class RouteGenerator {
         case Routes.productCategoryItemDetailsWise:
         return MaterialPageRoute(
           builder: (context) =>  ProductDetailsPage(),
+        );
+        case Routes.wallet:
+        return MaterialPageRoute(
+          builder: (context) =>  WalletScreen(),
+        );
+        case Routes.sendMoney:
+        return MaterialPageRoute(
+          builder: (context) =>  SendMoneyScreen(),
+        );
+        case Routes.transferMoneyHistory:
+        return MaterialPageRoute(
+          builder: (context) =>  TransferMoneyHistory(),
+        );
+        case Routes.myVideo:
+        return MaterialPageRoute(
+          builder: (context) =>  MyVideoScreen(),
         );
 
 

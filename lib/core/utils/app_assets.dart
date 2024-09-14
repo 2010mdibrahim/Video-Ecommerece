@@ -20,4 +20,7 @@ class AppAssets {
   static const String allProductIcon = 'assets/all_product_icon.png';
   static const String NOT_FOUND_IMAGE = 'assets/empty.png';
   static const String aveterImage = 'assets/aveter.jpg';
+  static const String point = 'assets/point.png';
+  static const String check = 'assets/check.png';
+  static const String cancel = 'assets/cancel.png';
 }

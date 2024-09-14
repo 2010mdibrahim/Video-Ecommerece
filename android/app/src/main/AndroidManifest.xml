@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application
+        android:usesCleartextTraffic= "true"
         android:label="e_commerce"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

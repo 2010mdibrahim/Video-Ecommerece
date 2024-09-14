@@ -7,25 +7,33 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
   final String? fontFamily;
+  final Color? appBarBackgroundColor, titleColor, backiconColor;
+  final TextAlign? textAlign;
+  final bool? isTextCenter;
 
   const CustomAppBar({
     Key? key,
     required this.title,
     this.onBackPressed,
-    this.fontFamily
+    this.fontFamily,
+    this.appBarBackgroundColor,
+    this.titleColor,
+    this.backiconColor,
+    this.textAlign,
+    this.isTextCenter,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.slightWhite,
-      centerTitle: true,
+      backgroundColor: appBarBackgroundColor ?? AppColors.slightWhite,
+      centerTitle: isTextCenter ?? true,
       title: Text(
         title,
-        textAlign: TextAlign.center,
+        textAlign: textAlign ?? TextAlign.center,
         style:GoogleFonts.podkova(
             letterSpacing: 0.2,
-            color: Colors.black,
+            color: titleColor ?? Colors.black,
             fontSize: 20.0,
             fontWeight:  FontWeight.w600,
           )
@@ -34,6 +42,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? IconButton(
               icon: const Icon(Icons.arrow_back_ios),
               onPressed: onBackPressed,
+        color: backiconColor ?? Colors.black,
             )
           : null,
     );

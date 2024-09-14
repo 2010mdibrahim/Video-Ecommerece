@@ -50,6 +50,14 @@ dependencies:
   photo_view: ^0.15.0
   image_picker: ^1.1.2
   permission_handler: ^11.3.1
+  file_picker:
+  chunked_uploader: ^1.1.0
+  flutter_video_info:
+  better_player: ^0.0.83
+  percent_indicator: ^4.2.3
+  video_thumbnail: ^0.5.3
+  path_provider:
+
 
 dev_dependencies:
   flutter_test:

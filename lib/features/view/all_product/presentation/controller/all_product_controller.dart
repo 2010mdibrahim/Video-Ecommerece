@@ -2,6 +2,7 @@ import 'package:e_commerce/features/view/all_product/data/model/product_category
 import 'package:e_commerce/features/view/all_product/domain/repository/product_category_repository.dart';
 import 'package:e_commerce/features/view/all_product/domain/usecase/product_category_pass_usecase.dart';
 import 'package:e_commerce/features/view/all_product/domain/usecase/product_category_usecase.dart';
+import 'package:e_commerce/features/view/all_product/presentation/controller/video_upload_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ import '../../../../../main.dart';
 import '../../data/model/product_category_wise_item_details.dart';
 import '../../data/model/product_category_wise_product_model.dart';
 
-class AllProductController extends GetxController{
+class AllProductController extends GetxController with VideoUploadController{
   var isSelected = 0.obs;
   var isLoading = false.obs;
   var isAllProductLoading = false.obs;
@@ -22,6 +23,7 @@ class AllProductController extends GetxController{
   var productCategoryWiseProductModel = ProductCategoryWiseProductModel().obs;
   var productCategoryWiseProductModell = ProductCategoryWiseProductModel().obs;
   var productCategoryWiseProductDetailsModel = ProductCategoryWiseItemDetails().obs;
+  var image = "".obs;
   @override
   void onInit() {
     productCategory();
@@ -80,6 +82,7 @@ class AllProductController extends GetxController{
       if (response?.data != null && response?.data is ProductCategoryWiseItemDetails) {
         print("This is product category");
         productCategoryWiseProductDetailsModel.value = response?.data ?? ProductCategoryWiseItemDetails();
+        image.value = productCategoryWiseProductDetailsModel.value.itemDetail?.thumbnail;
         RouteGenerator.pushNamed(
             navigatorKey.currentContext!, Routes.productCategoryItemDetailsWise);
         print("productCategoryList.first.name ${productCategoryList.first.name}");
