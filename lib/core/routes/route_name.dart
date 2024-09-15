@@ -10,5 +10,6 @@ class Routes {
   static const sendMoney = "/sendMoney";
   static const transferMoneyHistory = "/transferMoneyHistory";
   static const myVideo = "/myVideo";
+  static const reelsScreen = "/reelsScreen";
 
 }

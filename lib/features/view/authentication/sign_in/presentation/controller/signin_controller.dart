@@ -70,10 +70,12 @@ class SigninController extends GetxController {
         }
       }
     } catch (e) {
+      isLoading.value = false;
       print(e.toString() ?? '');
     } finally {
       isLoading.value = false;
     }
+    isLoading.value = false;
     update();
   }
 }

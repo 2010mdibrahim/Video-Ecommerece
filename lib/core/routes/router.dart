@@ -7,6 +7,7 @@ import '../../features/view/all_product/presentation/view/product_details_page.d
 import '../../features/view/authentication/sign_in/presentation/view/sign_in_page.dart';
 import '../../features/view/authentication/signup_screen/presentation/view/signup_screen.dart';
 import '../../features/view/my_video_screen/presentation/view/my_video_screen.dart';
+import '../../features/view/reels/presentation/view/reels_screen.dart';
 import '../../features/view/send_money_screen/presentation/view/send_money_screen.dart';
 import '../../features/view/send_money_screen/presentation/view/transfer_money_history.dart';
 import '../../features/view/splash_screen/presentation/view/splash_screen.dart';
@@ -130,6 +131,10 @@ class RouteGenerator {
         case Routes.myVideo:
         return MaterialPageRoute(
           builder: (context) =>  MyVideoScreen(),
+        );
+        case Routes.reelsScreen:
+        return MaterialPageRoute(
+          builder: (context) =>  ReelsScreen(),
         );
 
 

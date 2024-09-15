@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/core/core/extensions/extensions.dart';
+import 'package:e_commerce/core/di/app_component.dart';
 import 'package:e_commerce/core/source/dio_client.dart';
 import 'package:e_commerce/core/utils/appStyle.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/core/utils/app_colors.dart';
+import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:e_commerce/features/widget/cached_image_network/custom_cached_image_network.dart';
 import 'package:e_commerce/features/widget/custom_row/custom_row.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +16,8 @@ import '../../../../../core/routes/router.dart';
 import '../../../../widget/custom_calender/custom_table_calender.dart';
 
 class Homepage extends StatelessWidget {
-  const Homepage({super.key});
-
+  Homepage({super.key});
+  var reelsController = locator<ReelsController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +95,7 @@ class Homepage extends StatelessWidget {
                       title: "Wallet",
                       icon: AppAssets.wallet,
                       titleColor: HexColor("8C632A"),
-                      onPress: (){
+                      onPress: () {
                         RouteGenerator.pushNamed(context, Routes.wallet);
                       },
                     ),
@@ -182,7 +184,7 @@ class Homepage extends StatelessWidget {
                       title: "My Video",
                       icon: AppAssets.myVideo,
                       titleColor: HexColor("324F5F"),
-                      onPress: (){
+                      onPress: () {
                         RouteGenerator.pushNamed(context, Routes.myVideo);
                       },
                     ),
@@ -202,7 +204,7 @@ class Homepage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomRow(
-                      onPress: (){
+                      onPress: () {
                         RouteGenerator.pushNamed(context, Routes.sendMoney);
                       },
                       title: "Send Money",
@@ -213,7 +215,7 @@ class Homepage extends StatelessWidget {
                   20.pw,
                   Expanded(
                     child: CustomRow(
-                      onPress: (){
+                      onPress: () {
                         print(session.getToken);
                         RouteGenerator.pushNamed(context, Routes.allProducts);
                       },
@@ -225,23 +227,32 @@ class Homepage extends StatelessWidget {
                 ],
               ),
               20.ph,
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(500),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Image.asset(
-                      AppAssets.video,
-                      height: 71,
-                      width: 71,
-                    ),
-                    const Positioned(
-                        top: 0,
-                        bottom: 0,
-                        child: CustomSimpleText(text: "Videos", color: Colors.white, ))
-                  ],
+              InkWell(
+                onTap: () {
+                  RouteGenerator.pushNamed(context, Routes.reelsScreen);
+                  reelsController.reelsVideos();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(500),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        AppAssets.video,
+                        height: 71,
+                        width: 71,
+                      ),
+                      const Positioned(
+                          top: 0,
+                          bottom: 0,
+                          child: CustomSimpleText(
+                            text: "Videos",
+                            color: Colors.white,
+                          ))
+                    ],
+                  ),
                 ),
               ),
               20.ph,

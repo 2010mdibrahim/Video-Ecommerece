@@ -19,6 +19,10 @@ import '../../features/view/my_video_screen/data/repository/my_video_repository_
 import '../../features/view/my_video_screen/data/source/my_video_service.dart';
 import '../../features/view/my_video_screen/domain/repository/my_video_repository.dart';
 import '../../features/view/my_video_screen/presentation/controller/my_video_controller.dart';
+import '../../features/view/reels/data/repository/reels_repository_impl.dart';
+import '../../features/view/reels/data/source/reels_service.dart';
+import '../../features/view/reels/domain/repository/reels_repository.dart';
+import '../../features/view/reels/presentation/controller/reels_controller.dart';
 import '../source/dio_client.dart';
 import '../source/pref_manager.dart';
 import '../source/session_manager.dart';
@@ -49,6 +53,11 @@ Future<void> init() async {
   locator.registerFactory<MyVideoService>(() => MyVideoService());
   locator.registerFactory<MyVideoRepository>(
       () => MyVideoRepositoryImpl(locator<MyVideoService>()));
+  //reels
+  locator.registerFactory<ReelsController>(() => Get.put(ReelsController()));
+  locator.registerFactory<ReelsService>(() => ReelsService());
+  locator.registerFactory<ReelsRepository>(
+      () => ReelsRepositoryImpl(locator<ReelsService>()));
 
 
 //splash screen controller

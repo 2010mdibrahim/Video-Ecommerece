@@ -3,6 +3,7 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+
 }
 
 def localProperties = new Properties()
@@ -55,4 +56,5 @@ android {
 
 flutter {
     source = "../.."
+//    implementation 'com.google.android.exoplayer:exoplayer:2.15.0'
 }
