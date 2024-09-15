@@ -23,4 +23,8 @@ class AppAssets {
   static const String point = 'assets/point.png';
   static const String check = 'assets/check.png';
   static const String cancel = 'assets/cancel.png';
+  static const String share = 'assets/arrow.png';
+  static const String likeDone = 'assets/Like_done_icon.png';
+  static const String likeNotDone = 'assets/Like_not_done_icon.png';
+  static const String commentsIcon = 'assets/comments_icon.png';
 }

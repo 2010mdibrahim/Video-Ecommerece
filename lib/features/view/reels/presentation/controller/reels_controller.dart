@@ -13,16 +13,17 @@ class ReelsController extends GetxController {
   var reelsModel = AllReelsModel().obs;
   VideoPlayerController? videoPlayerController;
   var currentPage = 0.obs;
+  var indexFromMyVideo = 0.obs;
   var pageController = PageController().obs;
 
   @override
   void onInit() {
     reelsVideos();
-
     super.onInit();
   }
 
   reelsVideos() async {
+    print("hudai");
     try {
       isLoading.value = true;
       ReelsPassUseCase reelsPassUseCase =
@@ -30,10 +31,7 @@ class ReelsController extends GetxController {
       var response = await reelsPassUseCase();
       if (response?.data != null && response?.data is AllReelsModel) {
         reelsModel.value = response?.data ?? AllReelsModel();
-        if (reelsModel.value.data?.isNotEmpty == true) {
-          initController(
-              "http://erp.mahfuza-overseas.com/trending-house/${reelsModel.value.data?[0].videoUrl ?? ''}");
-        }
+
       } else {
         print('No data found');
       }

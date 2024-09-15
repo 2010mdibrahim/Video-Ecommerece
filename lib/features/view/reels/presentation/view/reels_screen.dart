@@ -1,11 +1,15 @@
 import 'dart:async'; // Import Timer
 
 import 'package:e_commerce/core/di/app_component.dart';
+import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
+
+import '../../../../widget/custom_elevatedButton/custom_eleveted_button.dart';
 
 class ReelsScreen extends StatefulWidget {
   const ReelsScreen({super.key});
@@ -14,7 +18,7 @@ class ReelsScreen extends StatefulWidget {
   State<ReelsScreen> createState() => _ReelsScreenState();
 }
 
-class _ReelsScreenState extends State<ReelsScreen> {
+class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
   VideoPlayerController? _controller;
   int _currentPage = 0;
   final PageController _pageController = PageController();
@@ -31,9 +35,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (controller.reelsModel.value.data?.isNotEmpty == true) {
+      print(
+          "controller.indexFromMyVideo.value ${controller.indexFromMyVideo.value}");
       final initialUrl =
-          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[0].videoUrl ?? ''}";
+          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
       _initController(initialUrl, controller.reelsModel.value.data?[0].id);
     }
   }
@@ -45,13 +52,11 @@ class _ReelsScreenState extends State<ReelsScreen> {
           _videoDuration = _controller?.value.duration ?? Duration.zero;
           _currentPosition = _controller?.value.position ?? Duration.zero;
           _isPlaying = _controller?.value.isPlaying ?? false;
-
           final percentageWatched = _calculatePercentageWatched();
           if (percentageWatched >= 80 && !_hasApiCallTriggered) {
             _callApi(id);
             _hasApiCallTriggered = true;
           }
-
           if (_controller?.value.position == _controller?.value.duration) {
             _controller?.pause();
             _isPlaying = false;
@@ -102,9 +107,25 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     _hideControlsTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _controller?.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      // Optionally handle resuming the video if needed
+      WidgetsBinding.instance.removeObserver(this);
+      _controller?.dispose();
+      _hideControlsTimer?.cancel();
+    }
   }
 
   double _calculatePercentageWatched() {
@@ -154,107 +175,150 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
     return GetBuilder(
         init: ReelsController(),
-        builder: (context) {
+        builder: (controller) {
           return Obx(() => Scaffold(
                 backgroundColor: Colors.black,
-                body: GestureDetector(
-                  onTap: _onTap, // Detect taps to show controls
-                  child: PageView.builder(
-                    controller: _pageController,
-                    scrollDirection: Axis.vertical,
-                    onPageChanged: _onPageChanged,
-                    itemCount: controller.reelsModel.value.data?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final videoData =
-                          controller.reelsModel.value.data?[index];
+                body: PopScope(
+                  canPop: true,
+                  onPopInvoked: (bool didPop) {
+                    if (didPop) {
+                      return;
+                    }
+                    setState(() {
+                      Navigator.pop(context);
+                      _controller?.dispose();
+                      _hideControlsTimer?.cancel();
+                    });
+                  },
+                  child: GestureDetector(
+                    onTap: _onTap, // Detect taps to show controls
+                    child: PageView.builder(
+                      controller: _pageController,
+                      scrollDirection: Axis.vertical,
+                      onPageChanged: _onPageChanged,
+                      itemCount: controller.reelsModel.value.data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        final videoData =
+                            controller.reelsModel.value.data?[index];
 
-                      return Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (_controller != null &&
-                              _controller!.value.isInitialized)
-                            AspectRatio(
-                              aspectRatio: _controller!.value.aspectRatio,
-                              child: VideoPlayer(_controller!),
-                            )
-                          else
-                            Center(child: CircularProgressIndicator()),
-                          if (_controlsVisible)
-                            Positioned(
-                              bottom: 10,
-                              left: 0,
-                              right: 0,
-                              child: AnimatedOpacity(
-                                opacity: _controlsVisible ? 1.0 : 0.0,
-                                duration: Duration(milliseconds: 300),
-                                child: SliderTheme(
-                                  data: SliderThemeData(
-                                    thumbShape: RoundSliderThumbShape(
-                                        enabledThumbRadius: 6),
-                                    overlayShape: RoundSliderOverlayShape(
-                                        overlayRadius: 16),
-                                    trackHeight: 1.9,
-                                  ),
-                                  child: Slider(
-                                    value:
-                                        _currentPosition.inSeconds.toDouble(),
-                                    min: 0.0,
-                                    max: _videoDuration.inSeconds.toDouble(),
-                                    activeColor: Colors.white,
-                                    inactiveColor: Colors.grey,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _controller?.seekTo(
-                                            Duration(seconds: value.toInt()));
-                                        // Keep controls visible while user interacts
-                                        _onTap();
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (_controlsVisible)
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              top: 0,
-                              child: AnimatedOpacity(
-                                opacity: _controlsVisible ? 1.0 : 0.0,
-                                duration: Duration(milliseconds: 300),
-                                child: Center(
-                                  child: IconButton(
-                                    icon: Icon(
-                                      _isPlaying
-                                          ? Icons.pause
-                                          : Icons.play_arrow,
-                                      size: 70,
-                                      color: Colors.white,
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            if (_controller != null &&
+                                _controller!.value.isInitialized)
+                              AspectRatio(
+                                aspectRatio: _controller!.value.aspectRatio,
+                                child: VideoPlayer(_controller!),
+                              )
+                            else
+                              Center(child: CircularProgressIndicator()),
+                            if (_controlsVisible)
+                              Positioned(
+                                bottom: 10,
+                                left: 0,
+                                right: 0,
+                                child: AnimatedOpacity(
+                                  opacity: _controlsVisible ? 1.0 : 0.0,
+                                  duration: Duration(milliseconds: 300),
+                                  child: SliderTheme(
+                                    data: SliderThemeData(
+                                      thumbShape: RoundSliderThumbShape(
+                                          enabledThumbRadius: 6),
+                                      overlayShape: RoundSliderOverlayShape(
+                                          overlayRadius: 16),
+                                      trackHeight: 1.9,
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        if (_isPlaying) {
-                                          _controller?.pause();
-                                          _isPlaying = false;
-                                        } else {
-                                          _controller?.play();
-                                          _isPlaying = true;
-                                        }
-                                      });
-                                      _onTap(); // Keep controls visible when user interacts
-                                    },
+                                    child: Slider(
+                                      value:
+                                          _currentPosition.inSeconds.toDouble(),
+                                      min: 0.0,
+                                      max: _videoDuration.inSeconds.toDouble(),
+                                      activeColor: Colors.white,
+                                      inactiveColor: Colors.grey,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _controller?.seekTo(
+                                              Duration(seconds: value.toInt()));
+                                          // Keep controls visible while user interacts
+                                          _onTap();
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            if (_controlsVisible)
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                top: 0,
+                                child: AnimatedOpacity(
+                                  opacity: _controlsVisible ? 1.0 : 0.0,
+                                  duration: Duration(milliseconds: 300),
+                                  child: Center(
+                                    child: IconButton(
+                                      icon: Icon(
+                                        _isPlaying
+                                            ? Icons.pause
+                                            : Icons.play_arrow,
+                                        size: 70,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (_isPlaying) {
+                                            _controller?.pause();
+                                            _isPlaying = false;
+                                          } else {
+                                            _controller?.play();
+                                            _isPlaying = true;
+                                          }
+                                        });
+                                        _onTap(); // Keep controls visible when user interacts
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
 
-                        ],
-                      );
-                    },
+                            // like share comment view
+
+                            Positioned(
+                              right: 0,
+                                bottom: 80,
+                                child: Column(children: [
+                                  CustomButtonLikeShareComment(icon: AppAssets.likeNotDone, onPress: (){}),
+                                  CustomButtonLikeShareComment(icon: AppAssets.commentsIcon, onPress: (){}),
+                                  CustomButtonLikeShareComment(icon: AppAssets.share, onPress: (){}),
+                                  CustomButtonLikeShareComment(icon: '', onPress: (){}, icons: Icon(Icons.remove_red_eye_outlined, size: 23,)),
+                            ],),
+                            ),
+                            Positioned(
+                              bottom: 40,
+                              child: CustomElevatedButton(
+                              hexColor: Colors.white,
+                              textColor: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              text: "Order Now",
+                              topRightRadius: 5,
+                              bottomLeftRadius: 5,
+                              topLeft: 5,
+                              bottomRight: 5,
+                              onPress: () {
+                                // RouteGenerator.pushNamed(context, Routes.homepage);
+                              },
+                            ),)
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ));
         });
+  }
+  Widget CustomButtonLikeShareComment({required String icon, required VoidCallback onPress, Icon? icons }){//{required Icon icon, required VoidCallback onPress}
+    return IconButton(onPressed: onPress, icon: icon.isNotEmpty? Image.asset(icon, height: 25,width: 30,fit: BoxFit.cover,) : (icons ?? SizedBox()), color: Colors.white,);
   }
 }

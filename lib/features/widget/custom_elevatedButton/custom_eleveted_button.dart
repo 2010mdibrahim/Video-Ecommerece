@@ -6,12 +6,24 @@ import 'package:hexcolor/hexcolor.dart';
 import '../../../main.dart';
 
 class CustomElevatedButton extends StatelessWidget {
-  final Color? color;
-  final HexColor? hexColor;
+  final Color? textColor;
+  final Color? hexColor;
+  final FontWeight? fontWeight;
   final VoidCallback? onPress;
   final String text;
+  final double? topRightRadius, bottomLeftRadius, topLeft, bottomRight;
   const CustomElevatedButton(
-      {super.key, this.color, this.onPress, this.hexColor, required this.text});
+      {super.key,
+      this.textColor,
+      this.onPress,
+      this.hexColor,
+      required this.text,
+      this.bottomLeftRadius,
+      this.topRightRadius,
+      this.bottomRight,
+      this.topLeft,
+        this.fontWeight,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +33,20 @@ class CustomElevatedButton extends StatelessWidget {
         backgroundColor: hexColor ?? AppColors.backgroundColor,
         minimumSize: Size(MediaQuery.of(context).size.width * 0.6, 38),
         maximumSize: Size(MediaQuery.of(context).size.width * 0.6, 38),
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
+            topRight: Radius.circular(topRightRadius ?? 10),
+            bottomLeft: Radius.circular(bottomLeftRadius ?? 10),
+            topLeft: Radius.circular(topLeft ?? 0),
+            bottomRight: Radius.circular(bottomRight ?? 0),
           ),
         ),
       ),
       onPressed: onPress,
       child: CustomSimpleText(
         text: text,
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
+        color: textColor ?? Colors.white,
+        fontWeight: fontWeight ?? FontWeight.w500,
         fontSize: 16,
         textAlign: TextAlign.center,
         alignment: Alignment.center,

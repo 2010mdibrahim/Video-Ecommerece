@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/core/di/app_component.dart';
@@ -5,6 +7,7 @@ import 'package:e_commerce/core/source/dio_client.dart';
 import 'package:e_commerce/core/utils/appStyle.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/core/utils/app_colors.dart';
+import 'package:e_commerce/features/view/my_video_screen/presentation/controller/my_video_controller.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:e_commerce/features/widget/cached_image_network/custom_cached_image_network.dart';
 import 'package:e_commerce/features/widget/custom_row/custom_row.dart';
@@ -18,6 +21,7 @@ import '../../../../widget/custom_calender/custom_table_calender.dart';
 class Homepage extends StatelessWidget {
   Homepage({super.key});
   var reelsController = locator<ReelsController>();
+  var myVideoController = locator<MyVideoController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,6 +190,7 @@ class Homepage extends StatelessWidget {
                       titleColor: HexColor("324F5F"),
                       onPress: () {
                         RouteGenerator.pushNamed(context, Routes.myVideo);
+                        // myVideoController.myVideoList();
                       },
                     ),
                   ),
@@ -231,6 +236,9 @@ class Homepage extends StatelessWidget {
                 onTap: () {
                   RouteGenerator.pushNamed(context, Routes.reelsScreen);
                   reelsController.reelsVideos();
+                  Random random =  Random();
+                  int randomNumber = random.nextInt(reelsController.reelsModel.value.data?.length ?? 0);
+                  reelsController.indexFromMyVideo.value = randomNumber;
                 },
                 child: Container(
                   decoration: BoxDecoration(
