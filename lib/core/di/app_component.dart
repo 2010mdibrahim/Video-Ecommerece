@@ -58,6 +58,9 @@ Future<void> init() async {
   locator.registerFactory<ReelsService>(() => ReelsService());
   locator.registerFactory<ReelsRepository>(
       () => ReelsRepositoryImpl(locator<ReelsService>()));
+  //like
+  locator.registerFactory<LikeRepository>(
+      () => LikeRepositoryImpl(locator<ReelsService>()));
 
 
 //splash screen controller

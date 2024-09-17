@@ -1,7 +1,9 @@
 import 'dart:async'; // Import Timer
 
+import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/core/di/app_component.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
+import 'package:e_commerce/features/view/reels/data/model/reels_model.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +11,12 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../../core/utils/appStyle.dart';
+import '../../../../../core/utils/app_colors.dart';
+import '../../../../../core/utils/app_sizes.dart';
+import '../../../../widget/cached_image_network/custom_cached_image_network.dart';
 import '../../../../widget/custom_elevatedButton/custom_eleveted_button.dart';
+import '../../../../widget/custom_textfield/custom_textfield.dart';
 
 class ReelsScreen extends StatefulWidget {
   const ReelsScreen({super.key});
@@ -161,7 +168,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     setState(() {
       _controlsVisible = true;
       _hideControlsTimer?.cancel(); // Cancel any existing timer
-      _hideControlsTimer = Timer(Duration(seconds: 3), () {
+      _hideControlsTimer = Timer(const Duration(seconds: 3), () {
         setState(() {
           _controlsVisible = false;
         });
@@ -211,7 +218,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                 child: VideoPlayer(_controller!),
                               )
                             else
-                              Center(child: CircularProgressIndicator()),
+                              const Center(child: CircularProgressIndicator()),
                             if (_controlsVisible)
                               Positioned(
                                 bottom: 10,
@@ -219,9 +226,9 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                 right: 0,
                                 child: AnimatedOpacity(
                                   opacity: _controlsVisible ? 1.0 : 0.0,
-                                  duration: Duration(milliseconds: 300),
+                                  duration: const Duration(milliseconds: 300),
                                   child: SliderTheme(
-                                    data: SliderThemeData(
+                                    data: const SliderThemeData(
                                       thumbShape: RoundSliderThumbShape(
                                           enabledThumbRadius: 6),
                                       overlayShape: RoundSliderOverlayShape(
@@ -255,7 +262,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                 top: 0,
                                 child: AnimatedOpacity(
                                   opacity: _controlsVisible ? 1.0 : 0.0,
-                                  duration: Duration(milliseconds: 300),
+                                  duration: const Duration(milliseconds: 300),
                                   child: Center(
                                     child: IconButton(
                                       icon: Icon(
@@ -286,29 +293,66 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
 
                             Positioned(
                               right: 0,
-                                bottom: 80,
-                                child: Column(children: [
-                                  CustomButtonLikeShareComment(icon: AppAssets.likeNotDone, onPress: (){}),
-                                  CustomButtonLikeShareComment(icon: AppAssets.commentsIcon, onPress: (){}),
-                                  CustomButtonLikeShareComment(icon: AppAssets.share, onPress: (){}),
-                                  CustomButtonLikeShareComment(icon: '', onPress: (){}, icons: Icon(Icons.remove_red_eye_outlined, size: 23,)),
-                            ],),
+                              bottom: 80,
+                              child: Column(
+                                children: [
+                                  CustomButtonLikeShareComment(
+                                      icon: videoData?.likeStatus == 0
+                                          ? AppAssets.likeNotDone
+                                          : AppAssets.likeDone,
+                                      onPress: () {
+                                        controller
+                                            .likeVideos(
+                                                likeValue: videoData?.likeStatus == 0
+                                                    ? 1
+                                                    : 0,
+                                                videoId: videoData?.id ?? 0)
+                                            .then((value) {
+                                          videoData?.likeStatus =
+                                              videoData?.likeStatus == 0 ? 1 : 0;
+                                        });
+                                      }),
+                                  CustomButtonLikeShareComment(
+                                      icon: AppAssets.commentsIcon,
+                                      onPress: () {}),
+                                  CustomButtonLikeShareComment(
+                                      icon: AppAssets.share, onPress: () {}),
+                                  CustomButtonLikeShareComment(
+                                      icon: '',
+                                      onPress: () {},
+                                      icons: const Icon(
+                                        Icons.remove_red_eye_outlined,
+                                        size: 23,
+                                      )),
+                                  CustomButtonLikeShareComment(
+                                      icon: '',
+                                      onPress: () {},
+                                      icons: const Icon(
+                                        Icons.shopping_cart,
+                                        size: 23,
+                                      )),
+                                ],
+                              ),
                             ),
                             Positioned(
                               bottom: 40,
                               child: CustomElevatedButton(
-                              hexColor: Colors.white,
-                              textColor: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              text: "Order Now",
-                              topRightRadius: 5,
-                              bottomLeftRadius: 5,
-                              topLeft: 5,
-                              bottomRight: 5,
-                              onPress: () {
-                                // RouteGenerator.pushNamed(context, Routes.homepage);
-                              },
-                            ),)
+                                hexColor: Colors.white,
+                                textColor: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                text: "Order Now",
+                                topRightRadius: 5,
+                                bottomLeftRadius: 5,
+                                topLeft: 5,
+                                bottomRight: 5,
+                                onPress: () {
+                                  confirmationDialog(context, videoData);
+                                  controller.priceSum.value =
+                                      controller.price.value;
+                                  // RouteGenerator.pushNamed(context, Routes.homepage);
+                                },
+                              ),
+                            )
                           ],
                         );
                       },
@@ -318,7 +362,438 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
               ));
         });
   }
-  Widget CustomButtonLikeShareComment({required String icon, required VoidCallback onPress, Icon? icons }){//{required Icon icon, required VoidCallback onPress}
-    return IconButton(onPressed: onPress, icon: icon.isNotEmpty? Image.asset(icon, height: 25,width: 30,fit: BoxFit.cover,) : (icons ?? SizedBox()), color: Colors.white,);
+
+  Widget CustomButtonLikeShareComment(
+      {required String icon, required VoidCallback onPress, Icon? icons}) {
+    //{required Icon icon, required VoidCallback onPress}
+    return IconButton(
+      onPressed: onPress,
+      icon: icon.isNotEmpty
+          ? Image.asset(
+              icon,
+              height: 25,
+              width: 30,
+              fit: BoxFit.cover,
+            )
+          : (icons ?? const SizedBox()),
+      color: Colors.white,
+    );
+  }
+
+  Widget CustomContainer({required String value}) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: AppColors.deepGrey),
+          color: Colors.transparent),
+      child: Center(
+        child: CustomSimpleText(
+          text: value,
+          fontWeight: FontWeight.bold,
+          fontSize: AppSizes.size12,
+          color: AppColors.black,
+          alignment: Alignment.bottomCenter,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget CustomRow({required String title, required String price}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomSimpleText(
+          text: title,
+          fontWeight: FontWeight.bold,
+          fontSize: AppSizes.size13,
+          color: AppColors.black,
+          alignment: Alignment.centerLeft,
+          textAlign: TextAlign.start,
+        ),
+        CustomSimpleText(
+          text: price,
+          fontWeight: FontWeight.bold,
+          fontSize: AppSizes.size13,
+          color: AppColors.black,
+          alignment: Alignment.centerRight,
+          textAlign: TextAlign.end,
+        ),
+      ],
+    );
+  }
+
+  Future<void> confirmationDialog(BuildContext context, Data? videoData) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CustomSimpleText(
+                text: "Purchase",
+                fontWeight: FontWeight.bold,
+                fontSize: AppSizes.size18,
+                color: AppColors.black,
+              ),
+              Row(
+                children: [
+                  InkWell(
+                      onTap: () {
+                        if (controller.orderNumber.value > 1) {
+                          controller.orderNumber.value--;
+                          controller.priceSum.value -= controller.price.value;
+                        }
+                      },
+                      child: CustomContainer(value: "-")),
+                  5.pw,
+                  Obx(
+                    () => CustomContainer(
+                        value: "${controller.orderNumber.value}"),
+                  ),
+                  5.pw,
+                  InkWell(
+                      onTap: () {
+                        controller.orderNumber.value++;
+                        controller.priceSum.value += controller.price.value;
+                      },
+                      child: CustomContainer(value: "+")),
+                ],
+              )
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CustomCachedImageNetwork(
+                            imageUrl:
+                                "http://erp.mahfuza-overseas.com/trending-house/${videoData?.thumbnail}",
+                            height: 100,
+                            weight:
+                                100, // Correct typo from "weight" to "width"
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Center(
+                          child: CustomSimpleText(
+                            text: "CNG Product",
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppSizes.size14,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                      width: 10), // Add some spacing between the two columns
+                  Flexible(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CustomSimpleText(
+                          text: "Price Details",
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppSizes.size16,
+                          color: AppColors.black,
+                        ),
+                        Obx(
+                          () => CustomRow(
+                              title: "Total MRP",
+                              price: "৳${controller.price.value}"),
+                        ),
+                        CustomRow(title: "Discount", price: "৳5"),
+                        CustomRow(title: "Tax", price: "৳3"),
+                        Divider(
+                          color: AppColors.backgroundColor,
+                        ),
+                        Obx(
+                          () => CustomRow(
+                              title: "Total ",
+                              price: "৳${controller.priceSum.value + 5 + 3}"),
+                        ),
+                        10.ph,
+                        CustomSimpleText(
+                          text: "HAVE A PROMOTION CODE?",
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppSizes.size12,
+                          color: AppColors.black,
+                          textDecoration: TextDecoration.underline,
+                        ),
+                        10.ph,
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            billingDetails(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.backgroundColor),
+                            child: CustomSimpleText(
+                              text: "Place Order",
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppSizes.size14,
+                              color: AppColors.white,
+                              textDecoration: TextDecoration.underline,
+                              alignment: Alignment.center,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              20.ph,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomSimpleText(
+                    text: "Content Creator will get bonus",
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppSizes.size14,
+                    color: AppColors.black,
+                    textDecoration: TextDecoration.none,
+                    alignment: Alignment.center,
+                    textAlign: TextAlign.center,
+                  ),
+                  10.pw,
+                  IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                      ))
+                ],
+              ),
+            ],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // Less curved corners
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> billingDetails(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.all(10),
+          backgroundColor: Colors.white,
+          title: CustomSimpleText(
+            text: "Billing Details",
+            fontWeight: FontWeight.bold,
+            fontSize: AppSizes.size18,
+            color: AppColors.black,
+          ),
+          content: SizedBox( // Constrain the width
+            width: MediaQuery.of(context).size.width ,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: controller.fullNameController.value,
+                          hintText: "Full Name",
+                          lebelText: "Full Name",
+                          labelLeftPadding: 14,
+                        ),
+                      ),
+                    ),
+                    10.pw,
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: controller.phoneNumberController.value,
+                          hintText: "Phone Number",
+                          lebelText: "Phone Number",
+                          labelLeftPadding: 14,
+                          textInputType: TextInputType.number,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                15.ph,
+                SizedBox(
+                  height: 45,
+                  child: CustomTextfield(
+                    controller: controller.detailAddressController.value,
+                    hintText: "Details Address",
+                    lebelText: "Details Address",
+                    labelLeftPadding: 14,
+                  ),
+                ),
+
+                CustomSimpleText(
+                  text: "Price Details",
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppSizes.size17,
+                  color: AppColors.black,
+                ),
+                10.ph,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomSimpleText(
+                      text: "Total MRP",
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                    CustomSimpleText(
+                      text: controller.priceSum.value.toString(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                  ],
+                )
+                // Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     Flexible(
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           ClipRRect(
+                //             borderRadius: BorderRadius.circular(10),
+                //             child: CustomCachedImageNetwork(
+                //               imageUrl:
+                //               "http://erp.mahfuza-overseas.com/trending-house/${videoData?.thumbnail}",
+                //               height: 100,
+                //               weight:
+                //               100, // Correct typo from "weight" to "width"
+                //             ),
+                //           ),
+                //           const SizedBox(height: 10),
+                //           Center(
+                //             child: CustomSimpleText(
+                //               text: "CNG Product",
+                //               fontWeight: FontWeight.bold,
+                //               fontSize: AppSizes.size14,
+                //               color: AppColors.black,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //     const SizedBox(
+                //         width: 10), // Add some spacing between the two columns
+                //     Flexible(
+                //       flex: 2,
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         mainAxisAlignment: MainAxisAlignment.start,
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           CustomSimpleText(
+                //             text: "Price Details",
+                //             fontWeight: FontWeight.bold,
+                //             fontSize: AppSizes.size16,
+                //             color: AppColors.black,
+                //           ),
+                //           Obx(
+                //                 () => CustomRow(
+                //                 title: "Total MRP",
+                //                 price: "৳${controller.price.value}"),
+                //           ),
+                //           CustomRow(title: "Discount", price: "৳5"),
+                //           CustomRow(title: "Tax", price: "৳3"),
+                //           Divider(
+                //             color: AppColors.backgroundColor,
+                //           ),
+                //           Obx(
+                //                 () => CustomRow(
+                //                 title: "Total ",
+                //                 price: "৳${controller.priceSum.value + 5 + 3}"),
+                //           ),
+                //           10.ph,
+                //           CustomSimpleText(
+                //             text: "HAVE A PROMOTION CODE?",
+                //             fontWeight: FontWeight.bold,
+                //             fontSize: AppSizes.size12,
+                //             color: AppColors.black,
+                //             textDecoration: TextDecoration.underline,
+                //           ),
+                //           10.ph,
+                //           Container(
+                //             padding: EdgeInsets.symmetric(vertical: 10),
+                //             decoration: BoxDecoration(
+                //                 borderRadius: BorderRadius.circular(10),
+                //                 color: AppColors.backgroundColor),
+                //             child: CustomSimpleText(
+                //               text: "Place Order",
+                //               fontWeight: FontWeight.bold,
+                //               fontSize: AppSizes.size14,
+                //               color: AppColors.white,
+                //               textDecoration: TextDecoration.underline,
+                //               alignment: Alignment.center,
+                //             ),
+                //           )
+                //         ],
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // 20.ph,
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     CustomSimpleText(
+                //       text: "Content Creator will get bonus",
+                //       fontWeight: FontWeight.bold,
+                //       fontSize: AppSizes.size14,
+                //       color: AppColors.black,
+                //       textDecoration: TextDecoration.none,
+                //       alignment: Alignment.center,
+                //       textAlign: TextAlign.center,
+                //     ),
+                //     10.pw,
+                //     IconButton(
+                //         onPressed: () {},
+                //         icon: Icon(
+                //           Icons.arrow_forward_ios,
+                //           size: 15,
+                //         ))
+                //   ],
+                // ),
+              ],
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // Less curved corners
+          ),
+        );
+      },
+    );
   }
 }

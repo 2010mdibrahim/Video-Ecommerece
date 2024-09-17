@@ -6,6 +6,8 @@ class CustomTextfield extends StatelessWidget {
   final TextEditingController controller;
   final bool? obscureText, needObscureText;
   final VoidCallback? onPress;
+  final double? labelLeftPadding;
+  final TextInputType? textInputType;
   const CustomTextfield(
       {super.key,
       required this.hintText,
@@ -13,7 +15,9 @@ class CustomTextfield extends StatelessWidget {
       this.obscureText,
       this.onPress,
       this.needObscureText,
+        this.labelLeftPadding,
       required this.controller,
+        this.textInputType
       });
 
   @override
@@ -21,9 +25,10 @@ class CustomTextfield extends StatelessWidget {
     return TextField(
       obscureText: obscureText ?? false,
       controller: controller,
+      keyboardType: textInputType ?? TextInputType.text,
       decoration: InputDecoration(
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          contentPadding: const EdgeInsets.only(left: 34.0),
+          contentPadding:  EdgeInsets.only(left: labelLeftPadding ?? 34.0),
           isDense: false,
           isCollapsed: false,
           enabledBorder: OutlineInputBorder(

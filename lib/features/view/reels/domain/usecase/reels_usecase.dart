@@ -6,3 +6,9 @@ abstract class ReelsUseCase {
   ReelsUseCase(this.reelsRepository);
 }
 
+abstract class LikeUseCase {
+  final LikeRepository likeRepository;
+
+  LikeUseCase(this.likeRepository);
+}
+

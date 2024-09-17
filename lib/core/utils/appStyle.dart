@@ -10,7 +10,17 @@ class CustomSimpleText extends StatelessWidget {
   final TextAlign? textAlign;
   final AlignmentGeometry? alignment;
   final int? maxLines;
-  const CustomSimpleText({super.key, required this.text, this.color, this.fontWeight, this.fontSize, this.textAlign, this.alignment, this.maxLines});
+  final TextDecoration? textDecoration;
+  const CustomSimpleText(
+      {super.key,
+      required this.text,
+      this.color,
+      this.fontWeight,
+      this.fontSize,
+      this.textAlign,
+      this.alignment,
+      this.maxLines,
+      this.textDecoration});
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +32,11 @@ class CustomSimpleText extends StatelessWidget {
         textAlign: textAlign ?? TextAlign.start,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.podkova(
-          letterSpacing: 0.2,
-          color: color ?? AppColors.backgroundColor,
-          fontSize: fontSize ?? 14,
-          fontWeight: fontWeight ?? FontWeight.w700,
-        ),
+            letterSpacing: 0.2,
+            color: color ?? AppColors.backgroundColor,
+            fontSize: fontSize ?? 14,
+            fontWeight: fontWeight ?? FontWeight.w700,
+            decoration: textDecoration ?? TextDecoration.none),
       ),
     );
   }
