@@ -40,7 +40,28 @@ class Data {
   int? status;
   String? createdAt;
   String? updatedAt;
+  String? creatorName;
+  String? creatorPhoto;
+  String? creatorPhone;
+  String? creatorEmail;
+  Null? creatorCountry;
+  String? creatorAddress;
+  Null? creatorShopName;
+  Null? creatorShopAddress;
   String? slug;
+  String? productName;
+  String? productPhoto;
+  String? productThumbnail;
+  Null? size;
+  Null? sizeQty;
+  Null? sizePrice;
+  Null? color;
+  int? price;
+  int? previousPrice;
+  String? details;
+  int? stock;
+  String? catName;
+  String? catPhoto;
   int? likeStatus;
 
   Data(
@@ -56,7 +77,28 @@ class Data {
         this.status,
         this.createdAt,
         this.updatedAt,
+        this.creatorName,
+        this.creatorPhoto,
+        this.creatorPhone,
+        this.creatorEmail,
+        this.creatorCountry,
+        this.creatorAddress,
+        this.creatorShopName,
+        this.creatorShopAddress,
         this.slug,
+        this.productName,
+        this.productPhoto,
+        this.productThumbnail,
+        this.size,
+        this.sizeQty,
+        this.sizePrice,
+        this.color,
+        this.price,
+        this.previousPrice,
+        this.details,
+        this.stock,
+        this.catName,
+        this.catPhoto,
         this.likeStatus});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -72,7 +114,28 @@ class Data {
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    creatorName = json['creator_name'];
+    creatorPhoto = json['creator_photo'];
+    creatorPhone = json['creator_phone'];
+    creatorEmail = json['creator_email'];
+    creatorCountry = json['creator_country'];
+    creatorAddress = json['creator_address'];
+    creatorShopName = json['creator_shop_name'];
+    creatorShopAddress = json['creator_shop_address'];
     slug = json['slug'];
+    productName = json['product_name'];
+    productPhoto = json['product_photo'];
+    productThumbnail = json['product_thumbnail'];
+    size = json['size'];
+    sizeQty = json['size_qty'];
+    sizePrice = json['size_price'];
+    color = json['color'];
+    price = json['price'];
+    previousPrice = json['previous_price'];
+    details = json['details'];
+    stock = json['stock'];
+    catName = json['cat_name'];
+    catPhoto = json['cat_photo'];
     likeStatus = json['like_status'];
   }
 
@@ -90,7 +153,28 @@ class Data {
     data['status'] = this.status;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    data['creator_name'] = this.creatorName;
+    data['creator_photo'] = this.creatorPhoto;
+    data['creator_phone'] = this.creatorPhone;
+    data['creator_email'] = this.creatorEmail;
+    data['creator_country'] = this.creatorCountry;
+    data['creator_address'] = this.creatorAddress;
+    data['creator_shop_name'] = this.creatorShopName;
+    data['creator_shop_address'] = this.creatorShopAddress;
     data['slug'] = this.slug;
+    data['product_name'] = this.productName;
+    data['product_photo'] = this.productPhoto;
+    data['product_thumbnail'] = this.productThumbnail;
+    data['size'] = this.size;
+    data['size_qty'] = this.sizeQty;
+    data['size_price'] = this.sizePrice;
+    data['color'] = this.color;
+    data['price'] = this.price;
+    data['previous_price'] = this.previousPrice;
+    data['details'] = this.details;
+    data['stock'] = this.stock;
+    data['cat_name'] = this.catName;
+    data['cat_photo'] = this.catPhoto;
     data['like_status'] = this.likeStatus;
     return data;
   }

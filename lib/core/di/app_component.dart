@@ -61,6 +61,12 @@ Future<void> init() async {
   //like
   locator.registerFactory<LikeRepository>(
       () => LikeRepositoryImpl(locator<ReelsService>()));
+  //add to cart
+  locator.registerFactory<AddToCartRepository>(
+      () => AddToCartRepositoryImpl(locator<ReelsService>()));
+  //remove to cart
+  locator.registerFactory<RemoveToCartRepository>(
+      () => RemoveToCartRepositoryImpl(locator<ReelsService>()));
 
 
 //splash screen controller

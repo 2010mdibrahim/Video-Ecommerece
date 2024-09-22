@@ -1,17 +1,33 @@
+import 'dart:convert';
+
+import 'package:e_commerce/core/core/extensions/extensions.dart';
+import 'package:e_commerce/core/utils/appStyle.dart';
+import 'package:e_commerce/core/utils/app_colors.dart';
+import 'package:e_commerce/core/utils/app_sizes.dart';
 import 'package:e_commerce/features/view/my_video_screen/data/model/my_video_model.dart';
 import 'package:e_commerce/features/view/reels/data/model/like_model.dart';
 import 'package:e_commerce/features/view/reels/domain/usecase/reels_pass_usecase.dart';
+import 'package:e_commerce/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../../core/di/app_component.dart';
+import '../../../../widget/custom_textfield/custom_textfield.dart';
+import '../../../all_product/presentation/controller/all_product_controller.dart';
+import '../../data/model/add_to_cart_model.dart';
+import '../../data/model/cart_item_delete_model.dart';
 import '../../data/model/reels_model.dart';
 import '../../domain/repository/reels_repository.dart';
 
 class ReelsController extends GetxController {
   var isLoading = false.obs;
+  var isAddToCartLoading = false.obs;
   var reelsModel = AllReelsModel().obs;
+  // var addToCartListModel = AllReelsModel().obs;
+  RxList<AddToCartModel> addToCartListModel =  <AddToCartModel>[].obs;
+  var addToCartModel = AddToCartModel().obs;
   var likeModel = LikeModel().obs;
   VideoPlayerController? videoPlayerController;
   var currentPage = 0.obs;
@@ -20,12 +36,20 @@ class ReelsController extends GetxController {
   var orderNumber = 1.obs;
   var price = 100.obs;
   var priceSum = 0.obs;
+  var totalMRP = 0.obs;
   var fullNameController = TextEditingController().obs;
   var phoneNumberController = TextEditingController().obs;
   var detailAddressController = TextEditingController().obs;
+  var creatorName = ''.obs;
+  var catName = ''.obs;
+  var productName = ''.obs;
+  var productPrice = ''.obs;
+  var creatorPhoto = ''.obs;
+  var allProductController = Get.put(AllProductController());
   @override
   void onInit() {
     reelsVideos();
+    allProductController.productCategory();
     super.onInit();
   }
 
@@ -38,7 +62,9 @@ class ReelsController extends GetxController {
       var response = await reelsPassUseCase();
       if (response?.data != null && response?.data is AllReelsModel) {
         reelsModel.value = response?.data ?? AllReelsModel();
-
+        for (var item in reelsModel.value.data ?? []) {
+          print("this is item ${item}");
+        }
       } else {
         print('No data found');
       }
@@ -49,7 +75,8 @@ class ReelsController extends GetxController {
     }
     update();
   }
- Future likeVideos({required int likeValue, required int videoId}) async {
+
+  Future likeVideos({required int likeValue, required int videoId}) async {
     print("hudai");
     try {
       isLoading.value = true;
@@ -62,7 +89,6 @@ class ReelsController extends GetxController {
       var response = await likePassUseCase(data);
       if (response?.data != null && response?.data is LikeModel) {
         likeModel.value = response?.data ?? LikeModel();
-
       } else {
         print('No data found');
       }
@@ -70,6 +96,196 @@ class ReelsController extends GetxController {
       print("This is an error: ${e.toString()}");
     } finally {
       isLoading.value = false;
+    }
+    update();
+  }
+
+  addToCartFunction(String productId, Data? videoData, int? id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isAddToCartLoading.value = true;
+    AddToCartPassUseCase addToCartPassUseCase =
+    AddToCartPassUseCase(locator<AddToCartRepository>());
+    // await prefs.remove('addToCart');
+    // await prefs.remove('cart');
+    var response = await addToCartPassUseCase(
+        productId, prefs.getString('cart') ?? '', id.toString());
+
+    if (response?.data != null && response?.data is AddToCartModel) {
+      addToCartModel.value = response?.data ?? AddToCartModel();
+
+      if (videoData != null) {
+        String? existingCartJson = prefs.getString('addToCart');
+        print(existingCartJson);
+        addToCartListModel.value = [];
+        if (existingCartJson != null) {
+          addToCartListModel.value = (jsonDecode(existingCartJson) as List)
+              .map((item) => AddToCartModel.fromJson(item))
+              .toList();
+        }
+
+        // Check if the product ID already exists in the cart
+        int existingIndex = addToCartListModel.value.indexWhere((item) {
+          print("product Id ${item.item?.id} $productId");
+          return item.item?.id == int.parse(productId);
+        });
+
+        if (existingIndex != -1) {
+          // Update the existing product data
+          addToCartListModel.value[existingIndex] = addToCartModel.value;
+          ScaffoldMessenger.of(navigatorKey.currentContext!)
+              .showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: CustomSimpleText(
+              text: "Item updated successfully",
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: AppSizes.size18,
+            ),
+          ));
+        } else {
+          // Add the product if it doesn't already exist in the cart
+          addToCartListModel.value.add(addToCartModel.value);
+          ScaffoldMessenger.of(navigatorKey.currentContext!)
+              .showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: CustomSimpleText(
+              text: "Item added successfully",
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: AppSizes.size18,
+            ),
+          ));
+        }
+
+        // Save the updated cart list to SharedPreferences
+        await prefs.setString('addToCart', jsonEncode(addToCartListModel.value));
+        await prefs.setString('cart', response?.data?.cart ?? '');
+      }
+    } else {
+      print('No data found');
+    }
+    isAddToCartLoading.value = false;
+    update();
+  }
+
+
+  removeToCartFunction(String productId, AddToCartModel? item) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      isAddToCartLoading.value = true;
+
+      RemoveToCartPassUseCase removeToCartPassUseCase =
+          RemoveToCartPassUseCase(locator<RemoveToCartRepository>());
+      var response = await removeToCartPassUseCase(
+          productId, prefs.getString('cart') ?? '');
+      print("response of remove ${response?.data}");
+      if (response?.data != null && response?.data is CartItemDeleteModel) {
+        removeFromCartList(item);
+        await prefs.setString('cart', response?.data?.cart ?? '');
+      } else {
+        print('No data found');
+      }
+    } catch (e) {
+      isAddToCartLoading.value = false;
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isAddToCartLoading.value = false;
+    }
+    update();
+  }
+
+  Future<List<AddToCartModel>?> getCartData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? videoDataJson = prefs.getString('addToCart');
+    addToCartListModel.value.clear();
+    if (videoDataJson != null) {
+      // Decode the JSON string back to a List of dynamic
+      List<dynamic> jsonData = jsonDecode(videoDataJson);
+
+      // Convert the dynamic List to List<Data>
+      List<AddToCartModel> dataList =
+          jsonData.map((item) => AddToCartModel.fromJson(item)).toList();
+      print("this is value : ${dataList}");
+      // Assign the data to addToCartListModel
+      addToCartListModel.value = dataList;
+
+
+      return dataList;
+    }
+    return null;
+  }
+
+  void increment({AddToCartModel? item}) {
+    if (item?.priceSum != null && (item?.productCountIncrement ?? 0) >= 1) {
+      if((item?.productCountIncrement ?? 0) > 1){
+        item?.priceSum = item.priceSum! + int.parse(item.item?.price.toString() ?? '');
+      }
+      else{
+        item?.priceSum = item.priceSum! + int.parse(item.item?.price.toString() ?? '');
+      }
+      item?.qty = (item.qty ?? 0) + 1;
+      item?.productCountIncrement = item.qty;
+      print("count ${item?.productCountIncrement}");
+
+    } else {
+      item?.priceSum = int.parse(item.price.toString());
+      item?.productCountIncrement = 1;
+    }
+    update();
+  }
+
+  void decrement({AddToCartModel? item}) {
+    // Ensure the item exists and that the quantity is greater than 1
+    if (item?.priceSum != null && (item?.productCountIncrement ?? 0) > 1) {
+
+      // Decrease the priceSum by item price
+      item?.priceSum = (item?.priceSum ?? 0) - (item?.item?.price ?? 0);
+
+      // Decrease the qty by 1
+      item?.qty = (item?.qty ?? 0) - 1;
+
+      // Reflect the new qty in productCountIncrement
+      item?.productCountIncrement = item?.qty;
+
+      print("Updated priceSum: ${item?.priceSum}");
+      print("Updated qty: ${item?.qty}");
+
+    } else {
+      // Handle the case where priceSum is null or the quantity is 1 or less
+      item?.priceSum = item?.item?.price ?? 0;
+      item?.productCountIncrement = 1;
+    }
+    update();  // Ensure UI updates
+  }
+
+
+// void removeItem(Data? item){
+//   addToCartListModel.value.data?.remove(item);
+//   update();
+// }
+  void removeFromCartList(AddToCartModel? videoData) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Retrieve the current cart list from SharedPreferences
+    String? cartListString = prefs.getString('addToCart');
+
+    if (cartListString != null) {
+      // Deserialize the JSON string to List
+      List<dynamic> cartList = jsonDecode(cartListString);
+
+      // Remove the specific item (if found)
+      cartList
+          .removeWhere((item) => item['product_id'] == videoData?.item?.id);
+
+      // Serialize the updated list back to JSON
+      String updatedCartListString = jsonEncode(cartList);
+
+      // Save the updated list back to SharedPreferences
+      await prefs.setString('addToCart', updatedCartListString);
+
+      // Also update your local model (if needed)
+      addToCartListModel.value
+          ?.removeWhere((item) => item.item?.id == videoData?.item?.id);
     }
     update();
   }
@@ -91,8 +307,6 @@ class ReelsController extends GetxController {
         await oldController?.dispose();
         initController(link);
       });
-
-
       videoPlayerController = null;
     }
     update();
@@ -105,5 +319,97 @@ class ReelsController extends GetxController {
         "http://erp.mahfuza-overseas.com/trending-house/$videoData";
     onControllerChange(videoUrl);
     update();
+  }
+  Future<void> billingDetails(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.all(10),
+          backgroundColor: Colors.white,
+          title: CustomSimpleText(
+            text: "Billing Details",
+            fontWeight: FontWeight.bold,
+            fontSize: AppSizes.size18,
+            color: AppColors.black,
+          ),
+          content: SizedBox( // Constrain the width
+            width: MediaQuery.of(context).size.width ,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: fullNameController.value,
+                          hintText: "Full Name",
+                          lebelText: "Full Name",
+                          labelLeftPadding: 14,
+                        ),
+                      ),
+                    ),
+                    10.pw,
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: phoneNumberController.value,
+                          hintText: "Phone Number",
+                          lebelText: "Phone Number",
+                          labelLeftPadding: 14,
+                          textInputType: TextInputType.number,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                15.ph,
+                SizedBox(
+                  height: 45,
+                  child: CustomTextfield(
+                    controller: detailAddressController.value,
+                    hintText: "Details Address",
+                    lebelText: "Details Address",
+                    labelLeftPadding: 14,
+                  ),
+                ),
+
+                CustomSimpleText(
+                  text: "Price Details",
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppSizes.size17,
+                  color: AppColors.black,
+                ),
+                10.ph,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomSimpleText(
+                      text: "Total MRP",
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                    CustomSimpleText(
+                      text: priceSum.value.toString(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                  ],
+                )
+
+              ],
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // Less curved corners
+          ),
+        );
+      },
+    );
   }
 }

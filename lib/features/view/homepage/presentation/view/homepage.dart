@@ -22,6 +22,7 @@ class Homepage extends StatelessWidget {
   Homepage({super.key});
   var reelsController = locator<ReelsController>();
   var myVideoController = locator<MyVideoController>();
+  var reelController = locator<ReelsController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +46,13 @@ class Homepage extends StatelessWidget {
           color: Colors.black,
         ),
         actions: [
+          IconButton(
+              onPressed: () {
+                RouteGenerator.pushNamed(context, Routes.addToCartListPage);
+                reelsController.getCartData();
+              },
+              icon: Icon(Icons.shopping_cart_sharp, size: 30, color: AppColors.black,)),
+          10.ph,
           IconButton(
               onPressed: () {},
               icon: Image.asset(

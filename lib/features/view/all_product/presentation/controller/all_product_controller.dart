@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/di/app_component.dart';
+import '../../../../../core/model/dropdown_model.dart';
 import '../../../../../core/routes/route_name.dart';
 import '../../../../../core/routes/router.dart';
 import '../../../../../main.dart';
@@ -24,6 +25,8 @@ class AllProductController extends GetxController with VideoUploadController{
   var productCategoryWiseProductModell = ProductCategoryWiseProductModel().obs;
   var productCategoryWiseProductDetailsModel = ProductCategoryWiseItemDetails().obs;
   var image = "".obs;
+  DropdownModel? selectedDropdown;
+  List<DropdownModel> popupItemMenu = [];
   @override
   void onInit() {
     productCategory();
@@ -36,12 +39,18 @@ class AllProductController extends GetxController with VideoUploadController{
       ProductCategoryPassUseCase productCategoryUseCase =
       ProductCategoryPassUseCase(locator<ProductCategoryRepository>());
       var response = await productCategoryUseCase();
-
+      popupItemMenu.clear();
+      popupItemMenu.add(DropdownModel(0, "Select category"));
       if (response?.data != null && response?.data is List<ProductCategoryModel>) {
         print("This is product category");
         List<ProductCategoryModel> dataList = response?.data as List<ProductCategoryModel>;
         productCategoryList.clear();
         productCategoryList.addAll(dataList);
+        for (var category in productCategoryList) {
+          for (var subCategory in category.subs ?? []) {
+            popupItemMenu.add(DropdownModel(subCategory.id, subCategory.name));
+          }
+        }
         print("productCategoryList.first.name ${productCategoryList.first.name}");
       } else {
         print('No data found');
@@ -51,6 +60,11 @@ class AllProductController extends GetxController with VideoUploadController{
     } finally {
       isLoading.value = false;
     }
+  }
+  selectMenu(DropdownModel selectedValue){
+    selectedDropdown = selectedValue;
+    print("the item ${selectedDropdown?.name}");
+    update();
   }
   productCategoryWiseProduct() async {
     try {

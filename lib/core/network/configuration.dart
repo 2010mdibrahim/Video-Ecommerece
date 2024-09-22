@@ -8,6 +8,9 @@ class NetworkConfiguration {
   static const String productCategoryWiseItemDetails = "item/";
   static const String myVideo = "my-videos";
   static const String like = "like-video";
+  static const String getAllVideos = "get-all-videos";
+  static const String addToCart = "addcart/";
+  static const String removeToCart = "removecart/";
   static const int success = 0;
   static const String successs = "Status.success";
   static const int error = 1;

@@ -11,5 +11,6 @@ class Routes {
   static const transferMoneyHistory = "/transferMoneyHistory";
   static const myVideo = "/myVideo";
   static const reelsScreen = "/reelsScreen";
+  static const addToCartListPage = "/addToCartListPage";
 
 }

@@ -151,6 +151,7 @@ class DioClient {
     Response? response;
     var connectivityResult = await (Connectivity().checkConnectivity());
     print("the url is ${NetworkConfiguration.baseUrl + path}");
+    print("response.dataASDasdASDasds1 ${response} $queryParameters");
     try {
       if (connectivityResult.contains(ConnectivityResult.mobile) ||
           connectivityResult.contains(ConnectivityResult.wifi)) {
@@ -166,7 +167,6 @@ class DioClient {
             receiveTimeout: const Duration(milliseconds: 3000),
           ),
         );
-        print("response.dataASDasdASDasds ${session.getToken}");
         print("response.dataASDasdASDasds ${response.data}");
         if (response.data != null) {
           logger.i("dio response $response");

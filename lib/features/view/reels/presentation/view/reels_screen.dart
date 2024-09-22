@@ -5,12 +5,15 @@ import 'package:e_commerce/core/di/app_component.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/features/view/reels/data/model/reels_model.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
+import 'package:e_commerce/features/widget/custom_richtext/custom_richtext.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../../core/model/dropdown_model.dart';
+import '../../../../../core/network/configuration.dart';
 import '../../../../../core/utils/appStyle.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_sizes.dart';
@@ -44,11 +47,32 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     if (controller.reelsModel.value.data?.isNotEmpty == true) {
+      print("");
       print(
           "controller.indexFromMyVideo.value ${controller.indexFromMyVideo.value}");
       final initialUrl =
           "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
-      _initController(initialUrl, controller.reelsModel.value.data?[0].id);
+      controller.creatorName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].creatorName ??
+          '';
+      controller.catName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].catName ??
+          '';
+      controller.productName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].productName ??
+          '';
+      controller.productPrice.value = controller
+              .reelsModel.value.data?[controller.indexFromMyVideo.value].price
+              .toString() ??
+          "";
+      controller.creatorPhoto.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].creatorPhoto ??
+          "";
+
+      _initController(
+          initialUrl,
+          controller
+              .reelsModel.value.data?[controller.indexFromMyVideo.value].id);
     }
   }
 
@@ -108,6 +132,22 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
       final id = controller.reelsModel.value.data?[index].id;
       final videoUrl =
           "http://erp.mahfuza-overseas.com/trending-house/$videoData";
+      controller.creatorName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].creatorName ??
+          '';
+      controller.catName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].catName ??
+          '';
+      controller.productName.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].productName ??
+          '';
+      controller.productPrice.value = controller
+              .reelsModel.value.data?[controller.indexFromMyVideo.value].price
+              .toString() ??
+          "";
+      controller.creatorPhoto.value = controller.reelsModel.value
+              .data?[controller.indexFromMyVideo.value].creatorPhoto ??
+          "";
       _onControllerChange(videoUrl, id);
     });
   }
@@ -207,7 +247,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                       itemBuilder: (context, index) {
                         final videoData =
                             controller.reelsModel.value.data?[index];
-
+                        print(videoData?.productPhoto);
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -293,7 +333,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
 
                             Positioned(
                               right: 0,
-                              bottom: 80,
+                              bottom: 110,
                               child: Column(
                                 children: [
                                   CustomButtonLikeShareComment(
@@ -303,13 +343,16 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                       onPress: () {
                                         controller
                                             .likeVideos(
-                                                likeValue: videoData?.likeStatus == 0
-                                                    ? 1
-                                                    : 0,
+                                                likeValue:
+                                                    videoData?.likeStatus == 0
+                                                        ? 1
+                                                        : 0,
                                                 videoId: videoData?.id ?? 0)
                                             .then((value) {
                                           videoData?.likeStatus =
-                                              videoData?.likeStatus == 0 ? 1 : 0;
+                                              videoData?.likeStatus == 0
+                                                  ? 1
+                                                  : 0;
                                         });
                                       }),
                                   CustomButtonLikeShareComment(
@@ -326,7 +369,13 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                       )),
                                   CustomButtonLikeShareComment(
                                       icon: '',
-                                      onPress: () {},
+                                      onPress: () {
+                                        controller.addToCartFunction(
+                                            videoData?.productId.toString() ??
+                                                '',
+                                            videoData,
+                                            videoData?.id);
+                                      },
                                       icons: const Icon(
                                         Icons.shopping_cart,
                                         size: 23,
@@ -335,23 +384,147 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                               ),
                             ),
                             Positioned(
-                              bottom: 40,
-                              child: CustomElevatedButton(
-                                hexColor: Colors.white,
-                                textColor: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                text: "Order Now",
-                                topRightRadius: 5,
-                                bottomLeftRadius: 5,
-                                topLeft: 5,
-                                bottomRight: 5,
-                                onPress: () {
-                                  confirmationDialog(context, videoData);
-                                  controller.priceSum.value =
-                                      controller.price.value;
-                                  // RouteGenerator.pushNamed(context, Routes.homepage);
-                                },
+                              left: 0,
+                              bottom: 110,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: CustomCachedImageNetwork(
+                                          imageUrl:
+                                              "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/users/${controller.creatorPhoto.value}",
+                                          height: 40,
+                                          weight: 40),
+                                    ),
+                                    10.pw,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        CustomRichText(
+                                          title: controller.creatorName.value,
+                                          titleTextColor: Colors.white,
+                                          heading: "Creator Name: ",
+                                          headingTextColor:
+                                              Colors.white.withOpacity(0.8),
+                                          headingFontSize: AppSizes.size14,
+                                        ),
+                                        Visibility(
+                                          visible:
+                                              controller.catName.value.isEmpty
+                                                  ? false
+                                                  : true,
+                                          child: CustomRichText(
+                                            title: controller.catName.value,
+                                            titleTextColor: Colors.white,
+                                            heading: "Product Category: ",
+                                            headingTextColor:
+                                                Colors.white.withOpacity(0.8),
+                                            headingFontSize: AppSizes.size14,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CustomSimpleText(
+                                              text: "Product Name: ",
+                                              color:
+                                                  Colors.white.withOpacity(0.8),
+                                              fontSize: AppSizes.size14,
+                                            ),
+                                            SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5,
+                                                child: CustomSimpleText(
+                                                  text: controller
+                                                      .productName.value,
+                                                  color: AppColors.white,
+                                                  maxLines: 1,
+                                                )),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
+                            ),
+                            Positioned(
+                              bottom: 40,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 37,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Colors.yellow),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: CustomSimpleText(
+                                          text:
+                                              "৳${controller.productPrice.value}"),
+                                    ),
+                                  ),
+                                  20.pw,
+                                  CustomElevatedButton(
+                                    hexColor: Colors.white,
+                                    textColor: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    text: "Order Now",
+                                    topRightRadius: 5,
+                                    bottomLeftRadius: 5,
+                                    topLeft: 5,
+                                    bottomRight: 5,
+                                    onPress: () {
+                                      confirmationDialog(context, videoData);
+                                      controller.priceSum.value =
+                                          controller.price.value;
+                                      // RouteGenerator.pushNamed(context, Routes.homepage);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                                right: 0,
+                                child: PopupMenuButton<DropdownModel>(
+                                  icon: Icon(Icons.menu, color: Colors.white),
+                                  onSelected: (DropdownModel selectedValue) {
+                                      controller.allProductController.selectMenu(selectedValue);
+
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      PopupMenuItem(
+                                        child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxHeight: 200, // Set the height of the dropdown
+                                            ),
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                children: controller.allProductController.popupItemMenu
+                                                    .map((DropdownModel model) {
+                                                  return PopupMenuItem<DropdownModel>(
+                                                    value: model,
+                                                    child: Text(model.name),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                      ),
+                                    ];
+                                  },
+                                )
                             )
                           ],
                         );
@@ -541,7 +714,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                         InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            billingDetails(context);
+                            controller.billingDetails(context);
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 10),
@@ -586,208 +759,6 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                 ],
               ),
             ],
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0), // Less curved corners
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> billingDetails(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          insetPadding: EdgeInsets.all(10),
-          backgroundColor: Colors.white,
-          title: CustomSimpleText(
-            text: "Billing Details",
-            fontWeight: FontWeight.bold,
-            fontSize: AppSizes.size18,
-            color: AppColors.black,
-          ),
-          content: SizedBox( // Constrain the width
-            width: MediaQuery.of(context).size.width ,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 45,
-                        child: CustomTextfield(
-                          controller: controller.fullNameController.value,
-                          hintText: "Full Name",
-                          lebelText: "Full Name",
-                          labelLeftPadding: 14,
-                        ),
-                      ),
-                    ),
-                    10.pw,
-                    Expanded(
-                      child: SizedBox(
-                        height: 45,
-                        child: CustomTextfield(
-                          controller: controller.phoneNumberController.value,
-                          hintText: "Phone Number",
-                          lebelText: "Phone Number",
-                          labelLeftPadding: 14,
-                          textInputType: TextInputType.number,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                15.ph,
-                SizedBox(
-                  height: 45,
-                  child: CustomTextfield(
-                    controller: controller.detailAddressController.value,
-                    hintText: "Details Address",
-                    lebelText: "Details Address",
-                    labelLeftPadding: 14,
-                  ),
-                ),
-
-                CustomSimpleText(
-                  text: "Price Details",
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppSizes.size17,
-                  color: AppColors.black,
-                ),
-                10.ph,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomSimpleText(
-                      text: "Total MRP",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size13,
-                      color: AppColors.black,
-                    ),
-                    CustomSimpleText(
-                      text: controller.priceSum.value.toString(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size13,
-                      color: AppColors.black,
-                    ),
-                  ],
-                )
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     Flexible(
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         mainAxisSize: MainAxisSize.min,
-                //         children: [
-                //           ClipRRect(
-                //             borderRadius: BorderRadius.circular(10),
-                //             child: CustomCachedImageNetwork(
-                //               imageUrl:
-                //               "http://erp.mahfuza-overseas.com/trending-house/${videoData?.thumbnail}",
-                //               height: 100,
-                //               weight:
-                //               100, // Correct typo from "weight" to "width"
-                //             ),
-                //           ),
-                //           const SizedBox(height: 10),
-                //           Center(
-                //             child: CustomSimpleText(
-                //               text: "CNG Product",
-                //               fontWeight: FontWeight.bold,
-                //               fontSize: AppSizes.size14,
-                //               color: AppColors.black,
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //     const SizedBox(
-                //         width: 10), // Add some spacing between the two columns
-                //     Flexible(
-                //       flex: 2,
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         mainAxisAlignment: MainAxisAlignment.start,
-                //         mainAxisSize: MainAxisSize.min,
-                //         children: [
-                //           CustomSimpleText(
-                //             text: "Price Details",
-                //             fontWeight: FontWeight.bold,
-                //             fontSize: AppSizes.size16,
-                //             color: AppColors.black,
-                //           ),
-                //           Obx(
-                //                 () => CustomRow(
-                //                 title: "Total MRP",
-                //                 price: "৳${controller.price.value}"),
-                //           ),
-                //           CustomRow(title: "Discount", price: "৳5"),
-                //           CustomRow(title: "Tax", price: "৳3"),
-                //           Divider(
-                //             color: AppColors.backgroundColor,
-                //           ),
-                //           Obx(
-                //                 () => CustomRow(
-                //                 title: "Total ",
-                //                 price: "৳${controller.priceSum.value + 5 + 3}"),
-                //           ),
-                //           10.ph,
-                //           CustomSimpleText(
-                //             text: "HAVE A PROMOTION CODE?",
-                //             fontWeight: FontWeight.bold,
-                //             fontSize: AppSizes.size12,
-                //             color: AppColors.black,
-                //             textDecoration: TextDecoration.underline,
-                //           ),
-                //           10.ph,
-                //           Container(
-                //             padding: EdgeInsets.symmetric(vertical: 10),
-                //             decoration: BoxDecoration(
-                //                 borderRadius: BorderRadius.circular(10),
-                //                 color: AppColors.backgroundColor),
-                //             child: CustomSimpleText(
-                //               text: "Place Order",
-                //               fontWeight: FontWeight.bold,
-                //               fontSize: AppSizes.size14,
-                //               color: AppColors.white,
-                //               textDecoration: TextDecoration.underline,
-                //               alignment: Alignment.center,
-                //             ),
-                //           )
-                //         ],
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // 20.ph,
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     CustomSimpleText(
-                //       text: "Content Creator will get bonus",
-                //       fontWeight: FontWeight.bold,
-                //       fontSize: AppSizes.size14,
-                //       color: AppColors.black,
-                //       textDecoration: TextDecoration.none,
-                //       alignment: Alignment.center,
-                //       textAlign: TextAlign.center,
-                //     ),
-                //     10.pw,
-                //     IconButton(
-                //         onPressed: () {},
-                //         icon: Icon(
-                //           Icons.arrow_forward_ios,
-                //           size: 15,
-                //         ))
-                //   ],
-                // ),
-              ],
-            ),
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0), // Less curved corners
