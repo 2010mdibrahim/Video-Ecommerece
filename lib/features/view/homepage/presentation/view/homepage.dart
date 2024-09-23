@@ -7,6 +7,7 @@ import 'package:e_commerce/core/source/dio_client.dart';
 import 'package:e_commerce/core/utils/appStyle.dart';
 import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/core/utils/app_colors.dart';
+import 'package:e_commerce/features/view/homepage/presentation/controller/home_controller.dart';
 import 'package:e_commerce/features/view/my_video_screen/presentation/controller/my_video_controller.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:e_commerce/features/widget/cached_image_network/custom_cached_image_network.dart';
@@ -23,6 +24,7 @@ class Homepage extends StatelessWidget {
   var reelsController = locator<ReelsController>();
   var myVideoController = locator<MyVideoController>();
   var reelController = locator<ReelsController>();
+  var homeController = locator<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +51,8 @@ class Homepage extends StatelessWidget {
           IconButton(
               onPressed: () {
                 RouteGenerator.pushNamed(context, Routes.addToCartListPage);
-                reelsController.getCartData();
+                // reelsController.getCartData();
+                homeController.homeAddToCartFunction();
               },
               icon: Icon(Icons.shopping_cart_sharp, size: 30, color: AppColors.black,)),
           10.ph,
@@ -243,10 +246,7 @@ class Homepage extends StatelessWidget {
               InkWell(
                 onTap: () {
                   RouteGenerator.pushNamed(context, Routes.reelsScreen);
-                  reelsController.reelsVideos();
-                  Random random =  Random();
-                  int randomNumber = random.nextInt(reelsController.reelsModel.value.data?.length ?? 0);
-                  reelsController.indexFromMyVideo.value = randomNumber;
+
                 },
                 child: Container(
                   decoration: BoxDecoration(

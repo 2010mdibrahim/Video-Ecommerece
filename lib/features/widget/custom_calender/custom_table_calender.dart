@@ -56,6 +56,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           });
         }
       },
+
       onPageChanged: (focusedDay) {
         _focusedDay = focusedDay;
       },

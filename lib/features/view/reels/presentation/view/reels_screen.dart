@@ -1,4 +1,5 @@
 import 'dart:async'; // Import Timer
+import 'dart:math';
 
 import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/core/di/app_component.dart';
@@ -9,6 +10,7 @@ import 'package:e_commerce/features/widget/custom_richtext/custom_richtext.dart'
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 
@@ -48,27 +50,28 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     if (controller.reelsModel.value.data?.isNotEmpty == true) {
       print("");
-      print(
-          "controller.indexFromMyVideo.value ${controller.indexFromMyVideo.value}");
-      final initialUrl =
-          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
+
       controller.creatorName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].creatorName ??
+          .data?[controller.indexFromMyVideo.value].creatorName ??
           '';
       controller.catName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].catName ??
+          .data?[controller.indexFromMyVideo.value].catName ??
           '';
       controller.productName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].productName ??
+          .data?[controller.indexFromMyVideo.value].productName ??
           '';
       controller.productPrice.value = controller
-              .reelsModel.value.data?[controller.indexFromMyVideo.value].price
-              .toString() ??
+          .reelsModel.value.data?[controller.indexFromMyVideo.value].price
+          .toString() ??
           "";
       controller.creatorPhoto.value = controller.reelsModel.value
               .data?[controller.indexFromMyVideo.value].creatorPhoto ??
           "";
-
+      Random random = Random();
+      int randomNumber = random.nextInt(controller.reelsModel.value.data?.length ?? 0);  // maxLength ensures it's positive
+      controller.indexFromMyVideo.value = randomNumber;
+      final initialUrl =
+          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
       _initController(
           initialUrl,
           controller
@@ -76,7 +79,10 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _initController(String link, int? id) {
+  Future<void> _initController(String link, int? id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.getString('addToCart');
+    print("this is cart ${prefs.getString('cart')}");
     _controller = VideoPlayerController.network(link)
       ..addListener(() {
         setState(() {
@@ -127,27 +133,30 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
 
   void _onPageChanged(int index) {
     setState(() {
+      print("This is index $index");
       _currentPage = index;
       final videoData = controller.reelsModel.value.data?[index].videoUrl ?? '';
       final id = controller.reelsModel.value.data?[index].id;
       final videoUrl =
           "http://erp.mahfuza-overseas.com/trending-house/$videoData";
-      controller.creatorName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].creatorName ??
-          '';
-      controller.catName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].catName ??
-          '';
-      controller.productName.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].productName ??
-          '';
-      controller.productPrice.value = controller
-              .reelsModel.value.data?[controller.indexFromMyVideo.value].price
-              .toString() ??
-          "";
-      controller.creatorPhoto.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].creatorPhoto ??
-          "";
+setState(() {
+  controller.creatorName.value = controller.reelsModel.value
+      .data?[index].creatorName ??
+      '';
+  controller.catName.value = controller.reelsModel.value
+      .data?[index].catName ??
+      '';
+  controller.productName.value = controller.reelsModel.value
+      .data?[index].productName ??
+      '';
+  controller.productPrice.value = controller
+      .reelsModel.value.data?[index].price
+      .toString() ??
+      "";
+  controller.creatorPhoto.value = controller.reelsModel.value
+      .data?[index].creatorPhoto ??
+      "";
+});
       _onControllerChange(videoUrl, id);
     });
   }
@@ -225,6 +234,40 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
         builder: (controller) {
           return Obx(() => Scaffold(
                 backgroundColor: Colors.black,
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  actions: [
+                    PopupMenuButton<DropdownModel>(
+                      icon: Icon(Icons.menu, color: Colors.white),
+                      onSelected: (DropdownModel selectedValue) {
+                        controller.selectMenu(selectedValue);
+
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          PopupMenuItem(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: 200, // Set the height of the dropdown
+                              ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: controller.allProductController.popupItemMenu
+                                      .map((DropdownModel model) {
+                                    return PopupMenuItem<DropdownModel>(
+                                      value: model,
+                                      child: Text(model.name),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ];
+                      },
+                    )
+                  ],
+                ),
                 body: PopScope(
                   canPop: true,
                   onPopInvoked: (bool didPop) {
@@ -237,7 +280,9 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                       _hideControlsTimer?.cancel();
                     });
                   },
-                  child: GestureDetector(
+                  child: controller.isLoading.value == true ? const Center(
+                    child: CircularProgressIndicator(),
+                  ) : controller.reelsModel.value.data?.isEmpty ?? false ? CustomSimpleText(text: "No data available", alignment: Alignment.center, color: Colors.white, fontSize: 18,) : GestureDetector(
                     onTap: _onTap, // Detect taps to show controls
                     child: PageView.builder(
                       controller: _pageController,
@@ -247,7 +292,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                       itemBuilder: (context, index) {
                         final videoData =
                             controller.reelsModel.value.data?[index];
-                        print(videoData?.productPhoto);
+                        print("length ${controller.reelsModel.value.data?.length}");
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -493,39 +538,11 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                 ],
                               ),
                             ),
-                            Positioned(
-                              top: 0,
-                                right: 0,
-                                child: PopupMenuButton<DropdownModel>(
-                                  icon: Icon(Icons.menu, color: Colors.white),
-                                  onSelected: (DropdownModel selectedValue) {
-                                      controller.allProductController.selectMenu(selectedValue);
-
-                                  },
-                                  itemBuilder: (BuildContext context) {
-                                    return [
-                                      PopupMenuItem(
-                                        child: ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                              maxHeight: 200, // Set the height of the dropdown
-                                            ),
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                children: controller.allProductController.popupItemMenu
-                                                    .map((DropdownModel model) {
-                                                  return PopupMenuItem<DropdownModel>(
-                                                    value: model,
-                                                    child: Text(model.name),
-                                                  );
-                                                }).toList(),
-                                              ),
-                                            ),
-                                          ),
-                                      ),
-                                    ];
-                                  },
-                                )
-                            )
+                            // Positioned(
+                            //   top: 0,
+                            //     right: 0,
+                            //     child:
+                            // )
                           ],
                         );
                       },
@@ -714,7 +731,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                         InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            controller.billingDetails(context);
+                            // controller.billingDetails(context);
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 10),

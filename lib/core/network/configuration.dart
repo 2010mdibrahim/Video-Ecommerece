@@ -7,6 +7,7 @@ class NetworkConfiguration {
   static const String productCategoryWiseProduct = "products";
   static const String productCategoryWiseItemDetails = "item/";
   static const String myVideo = "my-videos";
+  static const String carts = "carts";
   static const String like = "like-video";
   static const String getAllVideos = "get-all-videos";
   static const String addToCart = "addcart/";

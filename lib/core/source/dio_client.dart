@@ -168,6 +168,8 @@ class DioClient {
           ),
         );
         print("response.dataASDasdASDasds ${response.data}");
+        print("session token ${session.getToken}");
+
         if (response.data != null) {
           logger.i("dio response $response");
           responseCallback(response.data, response.statusMessage);

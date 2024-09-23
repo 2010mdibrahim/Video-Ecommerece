@@ -25,7 +25,7 @@ class AllProductController extends GetxController with VideoUploadController{
   var productCategoryWiseProductModell = ProductCategoryWiseProductModel().obs;
   var productCategoryWiseProductDetailsModel = ProductCategoryWiseItemDetails().obs;
   var image = "".obs;
-  DropdownModel? selectedDropdown;
+
   List<DropdownModel> popupItemMenu = [];
   @override
   void onInit() {
@@ -61,11 +61,7 @@ class AllProductController extends GetxController with VideoUploadController{
       isLoading.value = false;
     }
   }
-  selectMenu(DropdownModel selectedValue){
-    selectedDropdown = selectedValue;
-    print("the item ${selectedDropdown?.name}");
-    update();
-  }
+
   productCategoryWiseProduct() async {
     try {
       isAllProductLoading.value = true;

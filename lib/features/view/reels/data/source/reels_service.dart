@@ -13,11 +13,12 @@ var session = locator<SessionManager>();
 class ReelsService {
   final DioClient _dioClient = locator<DioClient>();
 
-  Future<Response<AllReelsModel>?> reelsPass() async {
+  Future<Response<AllReelsModel>?> reelsPass(Map<String, Object> data) async {
     Response<AllReelsModel>? apiResponse;
 
     await _dioClient.get(
       path: NetworkConfiguration.getAllVideos,
+      queryParameters: data,
       responseCallback: (response, message) {
         var products = AllReelsModel.fromJson(response);
         apiResponse = Response.success(products);

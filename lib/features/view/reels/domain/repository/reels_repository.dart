@@ -1,7 +1,9 @@
 
 
+
+import 'package:e_commerce/features/view/reels/data/model/add_to_cart_model.dart';
+
 import '../../../../../../core/source/model/api_response.dart';
-import '../../data/model/add_to_cart_model.dart';
 import '../../data/model/cart_item_delete_model.dart';
 import '../../data/model/like_model.dart';
 import '../../data/model/reels_model.dart';
@@ -11,7 +13,7 @@ abstract class ReelsRepository {
 
   ReelsRepository(this.reelsService);
 
-  Future<Response<AllReelsModel>?> reelsPass();
+  Future<Response<AllReelsModel>?> reelsPass(Map<String, Object> data);
 }
 abstract class LikeRepository {
   final ReelsService reelsService;

@@ -8,6 +8,7 @@ import 'package:e_commerce/features/view/authentication/signup_screen/data/repos
 import 'package:e_commerce/features/view/authentication/signup_screen/data/source/reg_service.dart';
 import 'package:e_commerce/features/view/authentication/signup_screen/domain/repository/reg_repository.dart';
 import 'package:e_commerce/features/view/authentication/signup_screen/presentation/controller/signup_controller.dart';
+import 'package:e_commerce/features/view/homepage/presentation/controller/home_controller.dart';
 import 'package:e_commerce/features/view/splash_screen/presentation/controller/splash_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -15,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/view/authentication/sign_in/data/repository/login_repository_impl.dart';
 import '../../features/view/authentication/sign_in/data/source/login_service.dart';
 import '../../features/view/authentication/sign_in/domain/repository/login_repository.dart';
+import '../../features/view/homepage/data/repository/home_repository_impl.dart';
+import '../../features/view/homepage/data/source/home_service.dart';
+import '../../features/view/homepage/domain/repository/home_repository.dart';
 import '../../features/view/my_video_screen/data/repository/my_video_repository_impl.dart';
 import '../../features/view/my_video_screen/data/source/my_video_service.dart';
 import '../../features/view/my_video_screen/domain/repository/my_video_repository.dart';
@@ -68,7 +72,11 @@ Future<void> init() async {
   locator.registerFactory<RemoveToCartRepository>(
       () => RemoveToCartRepositoryImpl(locator<ReelsService>()));
 
-
+//home controller
+  locator.registerFactory<HomeController>(() => Get.put(HomeController()));
+  locator.registerFactory<HomeService>(() => HomeService());
+  locator.registerFactory<HomeRepository>(
+          () => HomeRepositoryImpl(locator<HomeService>()));
 //splash screen controller
   locator.registerFactory<SplashScreenController>(() => Get.put(SplashScreenController()));
   //session
