@@ -10,6 +10,8 @@ class NetworkConfiguration {
   static const String carts = "carts";
   static const String like = "like-video";
   static const String getAllVideos = "get-all-videos";
+  static const String addbyone = "addbyone";
+  static const String reducebyone = "reducebyone";
   static const String addToCart = "addcart/";
   static const String removeToCart = "removecart/";
   static const int success = 0;

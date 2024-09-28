@@ -2,6 +2,7 @@ class HomeAddToCartModel {
   int? totalPrice;
   int? mainTotal;
   int? tx;
+  bool? isClickedIncrementDecrementButton;
   Map<String, ProductItem>? products;
 
   HomeAddToCartModel({
@@ -9,6 +10,7 @@ class HomeAddToCartModel {
     this.mainTotal,
     this.tx,
     this.products,
+    this.isClickedIncrementDecrementButton
   });
 
   factory HomeAddToCartModel.fromJson(Map<String, dynamic> json) => HomeAddToCartModel(

@@ -641,10 +641,9 @@ setState(() {
                       },
                       child: CustomContainer(value: "-")),
                   5.pw,
-                  Obx(
-                    () => CustomContainer(
+                  CustomContainer(
                         value: "${controller.orderNumber.value}"),
-                  ),
+
                   5.pw,
                   InkWell(
                       onTap: () {
@@ -704,21 +703,16 @@ setState(() {
                           fontSize: AppSizes.size16,
                           color: AppColors.black,
                         ),
-                        Obx(
-                          () => CustomRow(
+                         CustomRow(
                               title: "Total MRP",
-                              price: "৳${controller.price.value}"),
-                        ),
-                        CustomRow(title: "Discount", price: "৳5"),
-                        CustomRow(title: "Tax", price: "৳3"),
+                              price: "৳${videoData?.price}"),
                         Divider(
                           color: AppColors.backgroundColor,
                         ),
-                        Obx(
-                          () => CustomRow(
+                         CustomRow(
                               title: "Total ",
-                              price: "৳${controller.priceSum.value + 5 + 3}"),
-                        ),
+                              price: "৳${videoData?.price}"),
+
                         10.ph,
                         CustomSimpleText(
                           text: "HAVE A PROMOTION CODE?",
@@ -731,7 +725,7 @@ setState(() {
                         InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            // controller.billingDetails(context);
+                            controller.billingDetails(context);
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 10),

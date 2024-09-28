@@ -221,100 +221,101 @@ class ReelsController extends GetxController {
       onControllerChange(videoUrl);
       update();
     }
-    Future<void> billingDetails(BuildContext context) async {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            insetPadding: EdgeInsets.all(10),
-            backgroundColor: Colors.white,
-            title: CustomSimpleText(
-              text: "Billing Details",
-              fontWeight: FontWeight.bold,
-              fontSize: AppSizes.size18,
-              color: AppColors.black,
-            ),
-            content: SizedBox( // Constrain the width
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 45,
-                          child: CustomTextfield(
-                            controller: fullNameController.value,
-                            hintText: "Full Name",
-                            lebelText: "Full Name",
-                            labelLeftPadding: 14,
-                          ),
+
+  }
+  Future<void> billingDetails(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.all(10),
+          backgroundColor: Colors.white,
+          title: CustomSimpleText(
+            text: "Billing Details",
+            fontWeight: FontWeight.bold,
+            fontSize: AppSizes.size18,
+            color: AppColors.black,
+          ),
+          content: SizedBox( // Constrain the width
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: fullNameController.value,
+                          hintText: "Full Name",
+                          lebelText: "Full Name",
+                          labelLeftPadding: 14,
                         ),
                       ),
-                      10.pw,
-                      Expanded(
-                        child: SizedBox(
-                          height: 45,
-                          child: CustomTextfield(
-                            controller: phoneNumberController.value,
-                            hintText: "Phone Number",
-                            lebelText: "Phone Number",
-                            labelLeftPadding: 14,
-                            textInputType: TextInputType.number,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  15.ph,
-                  SizedBox(
-                    height: 45,
-                    child: CustomTextfield(
-                      controller: detailAddressController.value,
-                      hintText: "Details Address",
-                      lebelText: "Details Address",
-                      labelLeftPadding: 14,
                     ),
-                  ),
-
-                  CustomSimpleText(
-                    text: "Price Details",
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppSizes.size17,
-                    color: AppColors.black,
-                  ),
-                  10.ph,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomSimpleText(
-                        text: "Total MRP",
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppSizes.size13,
-                        color: AppColors.black,
+                    10.pw,
+                    Expanded(
+                      child: SizedBox(
+                        height: 45,
+                        child: CustomTextfield(
+                          controller: phoneNumberController.value,
+                          hintText: "Phone Number",
+                          lebelText: "Phone Number",
+                          labelLeftPadding: 14,
+                          textInputType: TextInputType.number,
+                        ),
                       ),
-                      CustomSimpleText(
-                        text: priceSum.value.toString(),
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppSizes.size13,
-                        color: AppColors.black,
-                      ),
-                    ],
-                  )
+                    ),
+                  ],
+                ),
+                15.ph,
+                SizedBox(
+                  height: 45,
+                  child: CustomTextfield(
+                    controller: detailAddressController.value,
+                    hintText: "Details Address",
+                    lebelText: "Details Address",
+                    labelLeftPadding: 14,
+                  ),
+                ),
 
-                ],
-              ),
+                CustomSimpleText(
+                  text: "Price Details",
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppSizes.size17,
+                  color: AppColors.black,
+                ),
+                10.ph,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomSimpleText(
+                      text: "Total MRP",
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                    CustomSimpleText(
+                      text: priceSum.value.toString(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.size13,
+                      color: AppColors.black,
+                    ),
+                  ],
+                )
+
+              ],
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0), // Less curved corners
-            ),
-          );
-        },
-      );
-    }
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // Less curved corners
+          ),
+        );
+      },
+    );
   }
 }

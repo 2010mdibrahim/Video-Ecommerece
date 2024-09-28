@@ -52,7 +52,7 @@ class Homepage extends StatelessWidget {
               onPressed: () {
                 RouteGenerator.pushNamed(context, Routes.addToCartListPage);
                 // reelsController.getCartData();
-                homeController.homeAddToCartFunction();
+                homeController.homeAddToCartFunction(from: '');
               },
               icon: Icon(Icons.shopping_cart_sharp, size: 30, color: AppColors.black,)),
           10.ph,
