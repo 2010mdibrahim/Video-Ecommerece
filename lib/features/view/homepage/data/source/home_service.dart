@@ -6,6 +6,7 @@ import '../../../../../../core/source/dio_client.dart';
 import '../../../../../../core/source/model/api_response.dart';
 import '../../../../../../core/source/session_manager.dart';
 import '../../../../../../core/utils/constants.dart';
+import '../model/checkout_model.dart';
 var session = locator<SessionManager>();
 
 class HomeService {
@@ -38,6 +39,24 @@ class HomeService {
       queryParameters: data,
       responseCallback: (response, message) {
         var products = AddByOneModel.fromJson(response);
+        apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<CheckoutModel>?> checkout( {required Map<String, Object> data}) async {
+    Response<CheckoutModel>? apiResponse;
+    await _dioClient.post(
+      path: NetworkConfiguration.checkout,
+      request: data,
+      responseCallback: (response, message) {
+        var products = CheckoutModel.fromJson(response);
         apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {

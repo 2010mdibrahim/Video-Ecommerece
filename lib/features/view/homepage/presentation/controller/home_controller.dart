@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/features/view/homepage/data/model/add_to_cart_model.dart';
+import 'package:e_commerce/features/view/homepage/presentation/controller/checkout_controller.dart';
 import 'package:e_commerce/features/widget/custom_toast/custom_toast.dart';
 import 'package:e_commerce/main.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ import '../../data/model/add_by_one_model.dart';
 import '../../domain/repository/home_repository.dart';
 import '../../domain/usecase/home_pass_usecase.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with CheckoutController{
   var isLoading = false.obs;
   var isCheckOutLoading = false.obs;
   var isAddByOneLoading = false.obs;
@@ -327,6 +328,7 @@ class HomeController extends GetxController {
                 text: "Place Order",
                 onPress: () {
                   Navigator.pop(context);
+                  checkOutFunction();
                   billingDetails(context, addToCartModel);
                 },
               )

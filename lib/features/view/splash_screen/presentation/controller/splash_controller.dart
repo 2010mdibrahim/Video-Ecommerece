@@ -1,5 +1,6 @@
 import 'package:e_commerce/features/view/authentication/sign_in/presentation/controller/signin_controller.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/di/app_component.dart';
 import '../../../../../core/routes/route_name.dart';
 import '../../../../../core/routes/router.dart';
@@ -15,6 +16,8 @@ var signInController = locator<SigninController>();
   }
 
 void checkApplicationInformation()async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
   Future.delayed(const Duration(seconds: 3), () async {
   if((session.getEmail?.isNotEmpty ?? false) && (session.getPassword?.isNotEmpty ?? false)){
     signInController.submitLoginData(navigatorKey.currentContext!);

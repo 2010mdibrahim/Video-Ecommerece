@@ -3,6 +3,7 @@ import 'package:e_commerce/features/view/homepage/data/model/add_to_cart_model.d
 import '../../../../../../core/source/model/api_response.dart';
 import '../../domain/repository/home_repository.dart';
 import '../model/add_by_one_model.dart';
+import '../model/checkout_model.dart';
 import '../source/home_service.dart';
 class HomeRepositoryImpl extends HomeRepository {
   HomeRepositoryImpl(HomeService homeService) : super(homeService);
@@ -19,6 +20,13 @@ class HomeRepositoryImpl extends HomeRepository {
       {required Map<String, Object> data}) async {
     Response<AddByOneModel>? apiResponse;
     apiResponse = await myVideoService.addbyone(data: data);
+    return apiResponse;
+  }
+  @override
+  Future<Response<CheckoutModel>?> checkout(
+      {required Map<String, Object> data}) async {
+    Response<CheckoutModel>? apiResponse;
+    apiResponse = await myVideoService.checkout(data: data);
     return apiResponse;
   }
 }

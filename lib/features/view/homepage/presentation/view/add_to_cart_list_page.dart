@@ -51,7 +51,7 @@ class AddToCartListPage extends StatelessWidget {
                                   )
                                 : ListView(
                                     children: homeController.homeAddToCartModel
-                                        .value.products!.entries
+                                        .value.products?.entries
                                         .map((entry) {
                                       // Get the key and product item
                                       String key = entry.key;
@@ -247,7 +247,7 @@ class AddToCartListPage extends StatelessWidget {
                                                   )))
                                         ],
                                       );
-                                    }).toList(),
+                                    }).toList() ?? [],
                                   ),
                       ),
                       InkWell(
@@ -260,6 +260,7 @@ class AddToCartListPage extends StatelessWidget {
                           // });
                           print(
                               "price sum ${homeController.homeAddToCartModel.value}");
+
                           homeController.homeAddToCartFunction(from: "dialog");
 
                         },
