@@ -21,27 +21,26 @@ import '../../data/model/add_by_one_model.dart';
 import '../../domain/repository/home_repository.dart';
 import '../../domain/usecase/home_pass_usecase.dart';
 
-class HomeController extends GetxController with CheckoutController{
+class HomeController extends GetxController with CheckoutController {
   var isLoading = false.obs;
   var isCheckOutLoading = false.obs;
   var isAddByOneLoading = false.obs;
-  var homeAddToCartModel = HomeAddToCartModel().obs;
-  var addByOneModel = AddByOneModel().obs;
-  var fullNameController = TextEditingController().obs;
-  var phoneNumberController = TextEditingController().obs;
-  var detailAddressController = TextEditingController().obs;
+
+
+
+
   @override
   void onInit() {
     // homeAddToCartFunction();
     super.onInit();
   }
 
-  homeAddToCartFunction({ String? from}) async {
+  homeAddToCartFunction({String? from}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
-      if(from == "dialog"){
+      if (from == "dialog") {
         isCheckOutLoading.value = true;
-      }else{
+      } else {
         isLoading.value = true;
       }
       var carts = {"cart": prefs.getString('cart') ?? ''};
@@ -50,11 +49,10 @@ class HomeController extends GetxController with CheckoutController{
       var response = await homePassUseCase(data: carts);
       if (response?.data != null && response?.data is HomeAddToCartModel) {
         homeAddToCartModel.value = response?.data ?? HomeAddToCartModel();
-        if(from == "dialog"){
+        if (from == "dialog") {
           confirmationDialog(
               navigatorKey.currentContext!, homeAddToCartModel.value);
         }
-
       } else {
         print('No data found');
       }
@@ -72,7 +70,8 @@ class HomeController extends GetxController with CheckoutController{
       {String? id,
       int? itemId,
       int? singleItemPrice,
-      required ProductItem item, required String type}) async {
+      required ProductItem item,
+      required String type}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       isAddByOneLoading.value = true;
@@ -90,14 +89,16 @@ class HomeController extends GetxController with CheckoutController{
       if (response?.data != null && response?.data is AddByOneModel) {
         addByOneModel.value = response?.data ?? AddByOneModel();
         await prefs.setString('cart', response?.data?.cart ?? '');
-        if(type == "increment"){
-        increment(item: item);
-        }else{
-        decrement(item: item);
+        if (type == "increment") {
+          increment(item: item);
+        } else {
+          decrement(item: item);
         }
         // successToast(context: navigatorKey.currentContext!, msg: msg)
       } else {
-        errorToast(context: navigatorKey.currentContext!, msg: "Something went wrong. Try again");
+        errorToast(
+            context: navigatorKey.currentContext!,
+            msg: "Something went wrong. Try again");
       }
     } catch (e) {
       isAddByOneLoading.value = false;
@@ -178,262 +179,8 @@ class HomeController extends GetxController with CheckoutController{
     }
     update();
   }
-  Future<void> confirmationDialog(
-      BuildContext context,
-      HomeAddToCartModel addToCartModel,
-      ) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: CustomSimpleText(
-            text: "PRICE DETAILS",
-            fontWeight: FontWeight.bold,
-            fontSize: AppSizes.size18,
-            color: AppColors.black,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "Total MRP",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerLeft,
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "৳${addToCartModel.totalPrice}",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerRight,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              10.ph,
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "Discount",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerLeft,
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "৳0",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerRight,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              10.ph,
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "Tax",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerLeft,
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "৳0",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerRight,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              5.ph,
-              Divider(),
-              5.ph,
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "Total",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerLeft,
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomSimpleText(
-                      text: "৳${addToCartModel.mainTotal}",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size14,
-                      color: AppColors.black,
-                      textDecoration: TextDecoration.none,
-                      alignment: Alignment.centerRight,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              10.ph,
-              CustomSimpleText(
-                text: "HAVE A PROMOTION CODE?",
-                fontWeight: FontWeight.bold,
-                fontSize: AppSizes.size14,
-                color: AppColors.black,
-                textDecoration: TextDecoration.underline,
-                alignment: Alignment.center,
-                textAlign: TextAlign.center,
-              ),
-              10.ph,
-              CustomElevatedButton(
-                text: "Place Order",
-                onPress: () {
-                  Navigator.pop(context);
-                  checkOutFunction();
-                  billingDetails(context, addToCartModel);
-                },
-              )
-            ],
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0), // Less curved corners
-          ),
-        );
-      },
-    );
-  }
-  Future<void> billingDetails(BuildContext context, HomeAddToCartModel addToCartModel) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          insetPadding: EdgeInsets.all(10),
-          backgroundColor: Colors.white,
-          title: CustomSimpleText(
-            text: "Billing Details",
-            fontWeight: FontWeight.bold,
-            fontSize: AppSizes.size18,
-            color: AppColors.black,
-          ),
-          content: SizedBox( // Constrain the width
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 45,
-                        child: CustomTextfield(
-                          controller: fullNameController.value,
-                          hintText: "Full Name",
-                          lebelText: "Full Name",
-                          labelLeftPadding: 14,
-                        ),
-                      ),
-                    ),
-                    10.pw,
-                    Expanded(
-                      child: SizedBox(
-                        height: 45,
-                        child: CustomTextfield(
-                          controller: phoneNumberController.value,
-                          hintText: "Phone Number",
-                          lebelText: "Phone Number",
-                          labelLeftPadding: 14,
-                          textInputType: TextInputType.number,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                15.ph,
-                SizedBox(
-                  height: 45,
-                  child: CustomTextfield(
-                    controller: detailAddressController.value,
-                    hintText: "Details Address",
-                    lebelText: "Details Address",
-                    labelLeftPadding: 14,
-                  ),
-                ),
-                10.ph,
-                CustomSimpleText(
-                  text: "Price Details",
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppSizes.size17,
-                  color: AppColors.black,
-                ),
-                10.ph,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomSimpleText(
-                      text: "Total MRP",
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size13,
-                      color: AppColors.black,
-                    ),
-                    CustomSimpleText(
-                      text: addToCartModel.mainTotal.toString(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.size13,
-                      color: AppColors.black,
-                    ),
-                  ],
-                )
 
-              ],
-            ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0), // Less curved corners
-          ),
-        );
-      },
-    );
-  }
+
+
+
 }

@@ -43,7 +43,8 @@ class SignInPage extends StatelessWidget {
                               fontSize: AppSizes.size40,
                               fontWeight: FontWeight.w600,
                               alignment: Alignment.bottomLeft,
-                            )),
+                            ),
+                        ),
                       ),
                     ),
                     Padding(
