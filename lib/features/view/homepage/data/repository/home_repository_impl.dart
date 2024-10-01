@@ -4,6 +4,7 @@ import '../../../../../../core/source/model/api_response.dart';
 import '../../domain/repository/home_repository.dart';
 import '../model/add_by_one_model.dart';
 import '../model/checkout_model.dart';
+import '../model/coupon_code_model.dart';
 import '../source/home_service.dart';
 class HomeRepositoryImpl extends HomeRepository {
   HomeRepositoryImpl(HomeService homeService) : super(homeService);
@@ -27,6 +28,13 @@ class HomeRepositoryImpl extends HomeRepository {
       {required Map<String, Object> data}) async {
     Response<CheckoutModel>? apiResponse;
     apiResponse = await myVideoService.checkout(data: data);
+    return apiResponse;
+  }
+  @override
+  Future<Response<CouponCodeModel>?> couponCode(
+      {required Map<String, Object> data}) async {
+    Response<CouponCodeModel>? apiResponse;
+    apiResponse = await myVideoService.couponCode(data: data);
     return apiResponse;
   }
 }

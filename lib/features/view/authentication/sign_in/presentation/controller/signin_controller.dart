@@ -56,7 +56,7 @@ class SigninController extends GetxController {
           var userInfo = await userinfoUseCase();
           if (!context.mounted) return;
           session.createUserSession(userInfo?.data);
-          print("user info model $userInfo");
+
           RouteGenerator.pushNamedAndRemoveAll(context, Routes.homepage);
           if (!context.mounted) return;
           if((session.getEmail?.isEmpty ?? false) && (session.getPassword?.isEmpty ?? false)){

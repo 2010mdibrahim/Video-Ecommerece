@@ -8,6 +8,7 @@ class SessionManager {
     try {
         setToken = loginModelData?.token;
         setPassword = password;
+        setCommissionBalance = loginModelData?.data?.commissionBalance.toString() ?? '';
       return true;
     } catch (e) {
       return false;
@@ -17,6 +18,7 @@ class SessionManager {
     try {
         setFullName = userInfo?.name;
         setEmail = userInfo?.email;
+
         setPhoneNumber = phoneNumber;
       return true;
     } catch (e) {
@@ -51,6 +53,11 @@ class SessionManager {
   set setPhoneNumber(String? value) => _prefManager.saveString(
       "phoneNumber", value ?? "");
 
+  String? get getCommissionBalance =>
+      _prefManager.getStringValue("commissionBalance");
+  set setCommissionBalance(String? value) => _prefManager.saveString(
+      "commissionBalance", value ?? "");
+
 
   String? get getPhoto =>
       _prefManager.getStringValue("photo");
@@ -73,6 +80,11 @@ set setBaseUrl(String? value)=> _prefManager.saveString("baseUrl", value);
       _prefManager.getStringValue("deviceId");
   set setDeviceId(String? value) => _prefManager.saveString(
       "deviceId", value ?? "");
+
+  String? get getExistingCode =>
+      _prefManager.getStringValue("existingCode");
+  set setExistingCode(String? value) => _prefManager.saveString(
+      "existingCode", value ?? "");
 
   Future<bool> logout() async {
     bool response = false;

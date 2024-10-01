@@ -260,7 +260,10 @@ class AddToCartListPage extends StatelessWidget {
                           // });
                           print(
                               "price sum ${homeController.homeAddToCartModel.value}");
-
+                          homeController.isContinueClicked.value = false;
+                          homeController.shippingSelectedValue.value = 0;
+                          homeController.packagingSelectedValue.value = 1;
+                          homeController.clearData();
                           homeController.homeAddToCartFunction(from: "dialog");
 
                         },

@@ -15,6 +15,7 @@ class NetworkConfiguration {
   static const String checkout = "checkout";
   static const String addToCart = "addcart/";
   static const String removeToCart = "removecart/";
+  static const String couponCheck = "carts/coupon/check";
   static const int success = 0;
   static const String successs = "Status.success";
   static const int error = 1;
