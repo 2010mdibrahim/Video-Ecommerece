@@ -6,6 +6,7 @@ import '../../../../../../core/source/dio_client.dart';
 import '../../../../../../core/source/model/api_response.dart';
 import '../../../../../../core/source/session_manager.dart';
 import '../../../../../../core/utils/constants.dart';
+import '../model/cashon_delivery_model.dart';
 import '../model/checkout_model.dart';
 import '../model/coupon_code_model.dart';
 var session = locator<SessionManager>();
@@ -76,6 +77,24 @@ class HomeService {
       request: data,
       responseCallback: (response, message) {
         var products = CouponCodeModel.fromJson(response);
+        apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<CashonDeliveryModel>?> cashOnDelivery( {required Map<String, Object> data}) async {
+    Response<CashonDeliveryModel>? apiResponse;
+    await _dioClient.post(
+      path: NetworkConfiguration.cashondelivery,
+      request: data,
+      responseCallback: (response, message) {
+        var products = CashonDeliveryModel.fromJson(response);
         apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {

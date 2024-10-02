@@ -13,50 +13,89 @@ import '../controller/home_controller.dart';
 
 class BillingInformationWidget extends StatelessWidget {
   final CheckoutModel checkoutModel;
-   BillingInformationWidget({super.key, required this.checkoutModel});
+  BillingInformationWidget({super.key, required this.checkoutModel});
   var checkoutController = locator<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 45,
-                child: CustomTextfield(
-                  controller: checkoutController.fullNameController.value,
-                  hintText: "Full Name",
-                  lebelText: "Full Name",
-                  labelLeftPadding: 14,
-                ),
+        Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Checkbox(
+                value: checkoutController.shippingDifferentAddress.value,
+                onChanged: (bool? value) {
+                  checkoutController.shippingDifferentAddress.value = value!;
+                },
               ),
-            ),
-            10.pw,
-            Expanded(
-              child: SizedBox(
-                height: 45,
-                child: CustomTextfield(
-                  controller: checkoutController.phoneNumberController.value,
-                  hintText: "Phone Number",
-                  lebelText: "Phone Number",
-                  labelLeftPadding: 14,
-                  textInputType: TextInputType.number,
-                ),
+              CustomSimpleText(
+                text: "Ship to a different address",
+                fontWeight: FontWeight.bold,
+                fontSize: AppSizes.size13,
+                color: AppColors.black,
               ),
-            ),
-          ],
-        ),
-        15.ph,
-        SizedBox(
-          height: 45,
-          child: CustomTextfield(
-            controller: checkoutController.detailAddressController.value,
-            hintText: "Details Address",
-            lebelText: "Details Address",
-            labelLeftPadding: 14,
+            ],
           ),
         ),
+        Obx(()=> Visibility(
+          visible: checkoutController.shippingDifferentAddress.value ? true : false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 45,
+                      child: CustomTextfield(
+                        controller: checkoutController.fullNameController.value,
+                        hintText: "Full Name",
+                        lebelText: "Full Name",
+                        labelLeftPadding: 14,
+                      ),
+                    ),
+                  ),
+                  10.pw,
+                  Expanded(
+                    child: SizedBox(
+                      height: 45,
+                      child: CustomTextfield(
+                        controller:
+                        checkoutController.phoneNumberController.value,
+                        hintText: "Phone Number",
+                        lebelText: "Phone Number",
+                        labelLeftPadding: 14,
+                        textInputType: TextInputType.number,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              15.ph,
+              SizedBox(
+                height: 45,
+                child: CustomTextfield(
+                  controller: checkoutController.detailAddressController.value,
+                  hintText: "Details Address",
+                  lebelText: "Details Address",
+                  labelLeftPadding: 14,
+                ),
+              ),
+              15.ph,
+              SizedBox(
+                height: 45,
+                child: CustomTextfield(
+                  controller: checkoutController.orderNotesController.value,
+                  hintText: "Order Notes(Optional)",
+                  lebelText: "Order Notes",
+                  labelLeftPadding: 14,
+                ),
+              ),
+            ],
+          ),
+        ),),
         10.ph,
         CustomSimpleText(
           text: "Price Details",
@@ -82,16 +121,23 @@ class BillingInformationWidget extends StatelessWidget {
             ),
           ],
         ),
-        checkoutController.couponCodeModel.value.totalPrice != null? SizedBox(height: 10,) : SizedBox.shrink(),
+        checkoutController.couponCodeModel.value.totalPrice != null
+            ? const SizedBox(
+                height: 10,
+              )
+            : const SizedBox.shrink(),
         Visibility(
-          visible:checkoutController.couponCodeModel.value.totalPrice != null ? true : false ,
+          visible: checkoutController.couponCodeModel.value.totalPrice != null
+              ? true
+              : false,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: CustomSimpleText(
-                  text: "Discount (${checkoutController.couponCodeModel.value.couponPercentage})",
+                  text:
+                      "Discount (${checkoutController.couponCodeModel.value.couponPercentage})",
                   fontWeight: FontWeight.bold,
                   fontSize: AppSizes.size14,
                   color: AppColors.black,
@@ -102,7 +148,8 @@ class BillingInformationWidget extends StatelessWidget {
               ),
               Expanded(
                 child: CustomSimpleText(
-                  text: "৳${checkoutController.couponCodeModel.value.couponDiscount}",
+                  text:
+                      "৳${checkoutController.couponCodeModel.value.couponDiscount}",
                   fontWeight: FontWeight.bold,
                   fontSize: AppSizes.size14,
                   color: AppColors.black,
@@ -115,7 +162,7 @@ class BillingInformationWidget extends StatelessWidget {
           ),
         ),
         10.ph,
-        Divider(),
+        const Divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -126,7 +173,10 @@ class BillingInformationWidget extends StatelessWidget {
               color: AppColors.black,
             ),
             CustomSimpleText(
-              text: checkoutController.couponCodeModel.value.totalPrice == null ? checkoutModel.totalPrice.toString() : checkoutController.couponCodeModel.value.totalPrice.toString(),
+              text: checkoutController.couponCodeModel.value.totalPrice == null
+                  ? checkoutModel.totalPrice.toString()
+                  : checkoutController.couponCodeModel.value.totalPrice
+                      .toString(),
               fontWeight: FontWeight.bold,
               fontSize: AppSizes.size13,
               color: AppColors.black,
@@ -136,7 +186,8 @@ class BillingInformationWidget extends StatelessWidget {
         10.ph,
         InkWell(
           onTap: () {
-            checkoutController.isCouponClicked.value = !checkoutController.isCouponClicked.value;
+            checkoutController.isCouponClicked.value =
+                !checkoutController.isCouponClicked.value;
           },
           child: const CustomSimpleText(
             text: "HAVE A PROMOTION CODE?",
@@ -146,36 +197,40 @@ class BillingInformationWidget extends StatelessWidget {
           ),
         ),
         10.ph,
-        Obx(()=> Visibility(
-          visible: checkoutController.isCouponClicked.value == false ? false : true,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: CustomTextfield(
-                  hintText: "Enter coupon code",
-                  lebelText: "Coupon code",
-                  controller: checkoutController.couponCodeController.value,
-                ),
-              ),
-              10.pw,
-              Expanded(
-                child: SizedBox(
-                  height: 48,
-                  child: CustomElevatedButton(
-                    text: "Apply",
-                    textSize: 13.0,
-                    topLeft: 10,
-                    bottomRight: 10,
-                    onPress: () {
-                      checkoutController.couponCodeFunction();
-                    },
+        Obx(
+          () => Visibility(
+            visible: checkoutController.isCouponClicked.value == false
+                ? false
+                : true,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: CustomTextfield(
+                    hintText: "Enter coupon code",
+                    lebelText: "Coupon code",
+                    controller: checkoutController.couponCodeController.value,
                   ),
                 ),
-              ),
-            ],
+                10.pw,
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: CustomElevatedButton(
+                      text: "Apply",
+                      textSize: 13.0,
+                      topLeft: 10,
+                      bottomRight: 10,
+                      onPress: () {
+                        checkoutController.couponCodeFunction();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),),
+        ),
       ],
     );
   }

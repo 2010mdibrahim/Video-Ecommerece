@@ -8,6 +8,8 @@ class SessionManager {
     try {
         setToken = loginModelData?.token;
         setPassword = password;
+        setAddress = loginModelData?.data?.address;
+        setPhoneNumber = loginModelData?.data?.phone;
         setCommissionBalance = loginModelData?.data?.commissionBalance.toString() ?? '';
       return true;
     } catch (e) {
@@ -19,7 +21,6 @@ class SessionManager {
         setFullName = userInfo?.name;
         setEmail = userInfo?.email;
 
-        setPhoneNumber = phoneNumber;
       return true;
     } catch (e) {
       return false;
@@ -58,13 +59,6 @@ class SessionManager {
   set setCommissionBalance(String? value) => _prefManager.saveString(
       "commissionBalance", value ?? "");
 
-
-  String? get getPhoto =>
-      _prefManager.getStringValue("photo");
-  set setPhoto(String? value) => _prefManager.saveString(
-      "photo", value ?? "");
-
-
 set setBaseUrl(String? value)=> _prefManager.saveString("baseUrl", value);
   String? get getBaseUrl =>
       _prefManager.getStringValue("baseUrl");
@@ -72,19 +66,16 @@ set setBaseUrl(String? value)=> _prefManager.saveString("baseUrl", value);
   String? get getToken =>
       _prefManager.getStringValue("token");
 
-  set setCandidateId(String? value)=> _prefManager.saveString("candidateId", value);
-  String? get getCandidateId =>
-      _prefManager.getStringValue("candidateId");
-
-  String? get getDeviceId =>
-      _prefManager.getStringValue("deviceId");
-  set setDeviceId(String? value) => _prefManager.saveString(
-      "deviceId", value ?? "");
 
   String? get getExistingCode =>
       _prefManager.getStringValue("existingCode");
   set setExistingCode(String? value) => _prefManager.saveString(
       "existingCode", value ?? "");
+
+  String? get getAddress =>
+      _prefManager.getStringValue("address");
+  set setAddress(String? value) => _prefManager.saveString(
+      "address", value ?? "");
 
   Future<bool> logout() async {
     bool response = false;

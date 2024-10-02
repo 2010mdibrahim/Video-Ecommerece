@@ -26,9 +26,6 @@ class HomeController extends GetxController with CheckoutController {
   var isCheckOutLoading = false.obs;
   var isAddByOneLoading = false.obs;
 
-
-
-
   @override
   void onInit() {
     // homeAddToCartFunction();

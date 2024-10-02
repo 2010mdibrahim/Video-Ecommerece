@@ -3,6 +3,7 @@ import 'package:e_commerce/features/view/homepage/data/model/add_to_cart_model.d
 import '../../../../../../core/source/model/api_response.dart';
 import '../../domain/repository/home_repository.dart';
 import '../model/add_by_one_model.dart';
+import '../model/cashon_delivery_model.dart';
 import '../model/checkout_model.dart';
 import '../model/coupon_code_model.dart';
 import '../source/home_service.dart';
@@ -35,6 +36,13 @@ class HomeRepositoryImpl extends HomeRepository {
       {required Map<String, Object> data}) async {
     Response<CouponCodeModel>? apiResponse;
     apiResponse = await myVideoService.couponCode(data: data);
+    return apiResponse;
+  }
+  @override
+  Future<Response<CashonDeliveryModel>?> cashOnDelivery(
+      {required Map<String, Object> data}) async {
+    Response<CashonDeliveryModel>? apiResponse;
+    apiResponse = await myVideoService.cashOnDelivery(data: data);
     return apiResponse;
   }
 }

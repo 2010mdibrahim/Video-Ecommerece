@@ -10,15 +10,17 @@ class InformationWidget extends StatelessWidget {
 var homeController = locator<HomeController>();
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return (homeController.fullNameController.value.text.isNotEmpty || homeController.phoneNumberController.value.text.isNotEmpty || homeController.detailAddressController.value.text.isNotEmpty) ? Column(
       children: [
         CustomRow(icon: Icons.person, text: homeController.fullNameController.value.text),
         10.ph,
         CustomRow(icon: Icons.phone_android_outlined, text: homeController.phoneNumberController.value.text),
         10.ph,
         CustomRow(icon: Icons.location_on, text: homeController.detailAddressController.value.text),
+        10.ph,
+        CustomRow(icon: Icons.note_alt_rounded, text: homeController.orderNotesController.value.text),
       ],
-    );
+    ) : const SizedBox.shrink();
   }
   Widget CustomRow({required IconData icon, required String text}){
     return Row(

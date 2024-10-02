@@ -16,8 +16,6 @@ var signInController = locator<SigninController>();
   }
 
 void checkApplicationInformation()async{
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-
   Future.delayed(const Duration(seconds: 3), () async {
   if((session.getEmail?.isNotEmpty ?? false) && (session.getPassword?.isNotEmpty ?? false)){
     signInController.submitLoginData(navigatorKey.currentContext!);

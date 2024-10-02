@@ -37,6 +37,8 @@ var checkoutController = locator<HomeController>();
                       groupValue: checkoutController.shippingSelectedValue.value,
                       onChanged: (int? value) {
                         checkoutController.shippingSelectedValue.value = value!;
+                        checkoutController.shippingSelectedValueId.value = item?.id.toInt() ?? 0;
+                        print("shipping ${checkoutController.shippingSelectedValueId.value}");
                       },
                     ),
                     CustomSimpleText(
@@ -77,6 +79,7 @@ var checkoutController = locator<HomeController>();
                         groupValue: checkoutController.packagingSelectedValue.value,
                         onChanged: (int? value) {
                           checkoutController.packagingSelectedValue.value = value!;
+                          checkoutController.packagingSelectedValueId.value = item?.id.toInt() ?? 0;
                         },
                       ),
                       CustomSimpleText(
