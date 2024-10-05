@@ -23,7 +23,6 @@ class Homepage extends StatelessWidget {
   Homepage({super.key});
   var reelsController = locator<ReelsController>();
   var myVideoController = locator<MyVideoController>();
-  var reelController = locator<ReelsController>();
   var homeController = locator<HomeController>();
   @override
   Widget build(BuildContext context) {

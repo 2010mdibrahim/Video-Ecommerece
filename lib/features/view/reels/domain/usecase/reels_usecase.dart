@@ -24,3 +24,9 @@ abstract class RemoveToCartUseCase {
   RemoveToCartUseCase(this.removeToCartRepository);
 }
 
+abstract class BuyNowUseCase {
+  final BuyNowRepository buyNowRepository;
+
+  BuyNowUseCase(this.buyNowRepository);
+}
+

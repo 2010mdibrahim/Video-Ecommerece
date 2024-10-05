@@ -49,10 +49,10 @@ class ItemDetail {
   var thumbnail;
   var file;
   var size;
-  var sizeQty;
-  var sizePrice;
-  var color;
-  var price;
+  dynamic sizeQty;
+  dynamic sizePrice;
+  dynamic color;
+  dynamic price;
   var previousPrice;
   var details;
   var stock;

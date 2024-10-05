@@ -10,6 +10,7 @@ class SessionManager {
         setPassword = password;
         setAddress = loginModelData?.data?.address;
         setPhoneNumber = loginModelData?.data?.phone;
+        setId = loginModelData?.data?.id.toString();
         setCommissionBalance = loginModelData?.data?.commissionBalance.toString() ?? '';
       return true;
     } catch (e) {
@@ -76,6 +77,11 @@ set setBaseUrl(String? value)=> _prefManager.saveString("baseUrl", value);
       _prefManager.getStringValue("address");
   set setAddress(String? value) => _prefManager.saveString(
       "address", value ?? "");
+
+  String? get getId =>
+      _prefManager.getStringValue("userId");
+  set setId(String? value) => _prefManager.saveString(
+      "userId", value ?? "");
 
   Future<bool> logout() async {
     bool response = false;

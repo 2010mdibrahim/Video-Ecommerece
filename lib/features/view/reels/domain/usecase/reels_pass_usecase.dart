@@ -1,6 +1,7 @@
 import 'package:e_commerce/features/view/reels/data/model/add_to_cart_model.dart';
 
 import '../../../../../../core/source/model/api_response.dart';
+import '../../data/model/by_now_model.dart';
 import '../../data/model/cart_item_delete_model.dart';
 import '../../data/model/like_model.dart';
 import '../../data/model/reels_model.dart';
@@ -35,6 +36,14 @@ class RemoveToCartPassUseCase extends RemoveToCartUseCase {
 
   Future<Response<CartItemDeleteModel>?> call(String productId, String cart) async {
     var response = await removeToCartRepository.removeToCart(productId, cart);
+    return response;
+  }
+}
+class BuyNowPassUseCase extends BuyNowUseCase {
+  BuyNowPassUseCase(super.buyNowRepository);
+
+  Future<Response<BuyNowModel>?> call(Map<String, Object> data) async {
+    var response = await buyNowRepository.buyNow(data);
     return response;
   }
 }

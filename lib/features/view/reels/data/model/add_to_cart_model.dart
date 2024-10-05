@@ -2,10 +2,10 @@ class AddToCartModel {
   int? i0;
   int? qty;
   int? sizeKey;
-  String? sizeQty;
-  String? sizePrice;
-  String? size;
-  String? color;
+  dynamic sizeQty;
+  dynamic sizePrice;
+  dynamic size;
+  dynamic color;
   int? stock;
   int? price;
   Item? item;
@@ -84,10 +84,10 @@ class Item {
   String? slug;
   String? name;
   String? photo;
-  String? size;
-  String? sizeQty;
-  String? sizePrice;
-  String? color;
+  dynamic size;
+  dynamic sizeQty;
+  dynamic sizePrice;
+  dynamic color;
   int? price;
   int? stock;
   String? type;
@@ -96,8 +96,8 @@ class Item {
   String? license;
   String? licenseQty;
   Null? measure;
-  String? wholeSellQty;
-  String? wholeSellDiscount;
+  List<dynamic>? wholeSellQty;
+  List<dynamic>? wholeSellDiscount;
   Null? attributes;
 
   Item(

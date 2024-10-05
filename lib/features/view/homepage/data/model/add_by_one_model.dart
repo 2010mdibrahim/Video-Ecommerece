@@ -5,10 +5,10 @@ class AddByOneModel {
   String? s3;
   int? qty;
   int? sizeKey;
-  String? sizeQty;
-  String? sizePrice;
-  String? size;
-  String? color;
+  dynamic sizeQty;
+  dynamic sizePrice;
+  dynamic size;
+  dynamic color;
   int? stock;
   int? price;
   Item? item;

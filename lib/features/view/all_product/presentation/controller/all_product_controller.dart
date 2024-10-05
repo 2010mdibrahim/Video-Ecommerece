@@ -107,8 +107,8 @@ class AllProductController extends GetxController with VideoUploadController{
   }
 
   categoryWiseProductItems({required Map<String, Object> data}) async {
-    try {
-      isAllProductLoading.value = true;
+    // try {
+    //   isAllProductLoading.value = true;
       ProductCategoryWiseItemPassUseCase productCategoryUseCase =
       ProductCategoryWiseItemPassUseCase(locator<ProductCategoryRepository>());
       var response = await productCategoryUseCase(data: data);
@@ -120,12 +120,10 @@ class AllProductController extends GetxController with VideoUploadController{
       } else {
         print('No data found');
       }
-    } catch (e) {
-      print("This is an error: ${e.toString()}");
-    } finally {
-      isAllProductLoading.value = false;
-    }
+    // } catch (e) {
+    //   print("This is an error: ${e.toString()}");
+    // } finally {
+    //   isAllProductLoading.value = false;
+    // }
   }
-
-
 }

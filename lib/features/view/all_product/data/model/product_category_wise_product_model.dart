@@ -8,19 +8,19 @@ class ProductCategoryWiseProductModel {
 
   ProductCategoryWiseProductModel.fromJson(Map<String, dynamic> json) {
     products = json['products'] != null
-        ? new Products.fromJson(json['products'])
+        ? Products.fromJson(json['products'])
         : null;
     nextPage = json['nextPage'];
     currentPage = json['currentPage'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.products != null) {
-      data['products'] = this.products!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (products != null) {
+      data['products'] = products!.toJson();
     }
-    data['nextPage'] = this.nextPage;
-    data['currentPage'] = this.currentPage;
+    data['nextPage'] = nextPage;
+    data['currentPage'] = currentPage;
     return data;
   }
 }
@@ -32,10 +32,10 @@ class Products {
   int? from;
   int? lastPage;
   String? lastPageUrl;
-  Null? nextPageUrl;
+  var nextPageUrl;
   String? path;
   int? perPage;
-  Null? prevPageUrl;
+  var prevPageUrl;
   int? to;
   int? total;
 
@@ -58,7 +58,7 @@ class Products {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     firstPageUrl = json['first_page_url'];
@@ -74,21 +74,21 @@ class Products {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['current_page'] = this.currentPage;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['current_page'] = currentPage;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['first_page_url'] = this.firstPageUrl;
-    data['from'] = this.from;
-    data['last_page'] = this.lastPage;
-    data['last_page_url'] = this.lastPageUrl;
-    data['next_page_url'] = this.nextPageUrl;
-    data['path'] = this.path;
-    data['per_page'] = this.perPage;
-    data['prev_page_url'] = this.prevPageUrl;
-    data['to'] = this.to;
-    data['total'] = this.total;
+    data['first_page_url'] = firstPageUrl;
+    data['from'] = from;
+    data['last_page'] = lastPage;
+    data['last_page_url'] = lastPageUrl;
+    data['next_page_url'] = nextPageUrl;
+    data['path'] = path;
+    data['per_page'] = perPage;
+    data['prev_page_url'] = prevPageUrl;
+    data['to'] = to;
+    data['total'] = total;
     return data;
   }
 }
@@ -99,14 +99,14 @@ class Data {
   String? name;
   String? slug;
   String? features;
-  String? colors;
+  dynamic colors;
   String? thumbnail;
   int? price;
   int? previousPrice;
   String? attributes;
-  String? size;
-  String? sizePrice;
-  Null? discountDate;
+  dynamic size;
+  dynamic sizePrice;
+  var discountDate;
 
   Data(
       {this.id,
@@ -140,20 +140,20 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user_id'] = this.userId;
-    data['name'] = this.name;
-    data['slug'] = this.slug;
-    data['features'] = this.features;
-    data['colors'] = this.colors;
-    data['thumbnail'] = this.thumbnail;
-    data['price'] = this.price;
-    data['previous_price'] = this.previousPrice;
-    data['attributes'] = this.attributes;
-    data['size'] = this.size;
-    data['size_price'] = this.sizePrice;
-    data['discount_date'] = this.discountDate;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['user_id'] = userId;
+    data['name'] = name;
+    data['slug'] = slug;
+    data['features'] = features;
+    data['colors'] = colors;
+    data['thumbnail'] = thumbnail;
+    data['price'] = price;
+    data['previous_price'] = previousPrice;
+    data['attributes'] = attributes;
+    data['size'] = size;
+    data['size_price'] = sizePrice;
+    data['discount_date'] = discountDate;
     return data;
   }
 }

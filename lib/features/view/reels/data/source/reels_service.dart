@@ -5,6 +5,7 @@ import '../../../../../../core/source/model/api_response.dart';
 import '../../../../../../core/source/session_manager.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../model/add_to_cart_model.dart';
+import '../model/by_now_model.dart';
 import '../model/cart_item_delete_model.dart';
 import '../model/like_model.dart';
 import '../model/reels_model.dart';
@@ -86,6 +87,25 @@ class ReelsService {
       queryParameters: cartDetails,
       responseCallback: (response, message) {
         var products = CartItemDeleteModel.fromJson(response);
+        apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<BuyNowModel>?> buyNow(Map<String, Object> data) async {
+    Response<BuyNowModel>? apiResponse;
+
+    await _dioClient.post(
+      path: NetworkConfiguration.buyNow,
+      request: data,
+      responseCallback: (response, message) {
+        var products = BuyNowModel.fromJson(response);
         apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {

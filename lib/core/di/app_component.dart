@@ -71,6 +71,9 @@ Future<void> init() async {
   //remove to cart
   locator.registerFactory<RemoveToCartRepository>(
       () => RemoveToCartRepositoryImpl(locator<ReelsService>()));
+  //Buy now
+  locator.registerFactory<BuyNowRepository>(
+      () => BuyNowRepositoryImpl(locator<ReelsService>()));
 
 //home controller
   locator.registerFactory<HomeController>(() => Get.put(HomeController()));

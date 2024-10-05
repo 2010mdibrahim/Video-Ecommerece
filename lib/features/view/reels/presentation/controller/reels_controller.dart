@@ -4,8 +4,10 @@ import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/core/utils/appStyle.dart';
 import 'package:e_commerce/core/utils/app_colors.dart';
 import 'package:e_commerce/core/utils/app_sizes.dart';
+import 'package:e_commerce/features/view/reels/data/model/by_now_model.dart';
 import 'package:e_commerce/features/view/reels/data/model/like_model.dart';
 import 'package:e_commerce/features/view/reels/domain/usecase/reels_pass_usecase.dart';
+import 'package:e_commerce/features/widget/custom_toast/custom_toast.dart';
 import 'package:e_commerce/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,8 +16,13 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../../core/di/app_component.dart';
 import '../../../../../core/model/dropdown_model.dart';
+import '../../../../../core/source/dio_client.dart';
 import '../../../../widget/custom_textfield/custom_textfield.dart';
 import '../../../all_product/presentation/controller/all_product_controller.dart';
+import '../../../homepage/data/model/coupon_code_model.dart';
+import '../../../homepage/domain/repository/home_repository.dart';
+import '../../../homepage/domain/usecase/home_pass_usecase.dart';
+import '../../../homepage/presentation/controller/home_controller.dart';
 import '../../data/model/add_to_cart_model.dart';
 import '../../data/model/cart_item_delete_model.dart';
 import '../../data/model/reels_model.dart';
@@ -25,6 +32,9 @@ class ReelsController extends GetxController {
   var isLoading = false.obs;
   var isAddToCartLoading = false.obs;
   var reelsModel = AllReelsModel().obs;
+  var couponCodeModel = CouponCodeModel().obs;
+  var buyNowModel = BuyNowModel().obs;
+  var isCouponClicked = false.obs;
   // var addToCartListModel = AllReelsModel().obs;
   // RxList<AddToCartModel> addToCartListModel =  <AddToCartModel>[].obs;
   var addToCartModel = AddToCartModel().obs;
@@ -40,13 +50,31 @@ class ReelsController extends GetxController {
   var fullNameController = TextEditingController().obs;
   var phoneNumberController = TextEditingController().obs;
   var detailAddressController = TextEditingController().obs;
+  var orderNotesController = TextEditingController().obs;
+  var couponCodeController = TextEditingController().obs;
+  var shippingSelectedValue = 0.obs;
+  var shippingSelectedValueId = 0.obs;
+  var packagingSelectedValue = 1.obs;
+  var packagingSelectedValueId = 1.obs;
+  var isContinueClicked = false.obs;
+  var shippingDifferentAddress = false.obs;
   var creatorName = ''.obs;
+  var productId = ''.obs;
   var catName = ''.obs;
   var productName = ''.obs;
   var productPrice = ''.obs;
   var creatorPhoto = ''.obs;
+  RxString selectSize = ''.obs;
+  var selectSizeId = 0.obs;
+  var selectSizePrice = ''.obs;
+  var selectSizeColor = ''.obs;
+  var selectSizeQty = ''.obs;
+  var selectSizeKey = ''.obs;
+  var isCheckOutDataLoding = false.obs;
+  var isBuyNowLoading = false.obs;
   DropdownModel? selectedDropdown;
   var allProductController = Get.put(AllProductController());
+  var homeController = locator<HomeController>();
   @override
   void onInit() {
     reelsVideos(videoCategoryId: 0);
@@ -68,6 +96,8 @@ class ReelsController extends GetxController {
       var response = await reelsPassUseCase(data);
       if (response?.data != null && response?.data is AllReelsModel) {
         reelsModel.value = response?.data ?? AllReelsModel();
+        selectSize.value = reelsModel.value?.data?.first.size?.first.toString() ?? '';
+        totalMRP.value = int.parse(reelsModel.value?.data?.first.sizePrice?.first ?? '');
         for (var item in reelsModel.value.data ?? []) {
           print("this is item ${item}");
         }
@@ -223,6 +253,81 @@ class ReelsController extends GetxController {
     }
 
   }
+  couponCodeFunction() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("value of coupon");
+    try {
+      if (couponCodeController.value.text.isNotEmpty) {
+        isCheckOutDataLoding.value = true;
+        var carts = {
+          "code": couponCodeController.value.text,
+          "total": totalMRP.value.toString(),
+          "shipping_cost": "0",
+          "exist_code": session.getExistingCode ?? '',
+          "cart": prefs.getString('cart') ?? ''
+        };
+        CouponCodePassUseCase codePassUseCase =
+        CouponCodePassUseCase(locator<HomeRepository>());
+        var response = await codePassUseCase(data: carts);
+        if (response?.data != null && response?.data is CouponCodeModel) {
+          couponCodeModel.value = response?.data ?? CouponCodeModel();
+          session.setExistingCode = couponCodeModel.value.existCode;
+          print(response?.data);
+        } else {
+          // ErrorDialog(navigatorKey.currentContext!, msg: "No Coupon Available");
+        }
+      }
+    } catch (e) {
+      isCheckOutDataLoding.value = false;
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isCheckOutDataLoding.value = false;
+    }
+  }
+  Future <void> buyNowFunction({int? videoID}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("value of coupon ${productId.value}");
+    print("value of coupon ${selectSizeQty.value}");
+    print("value of coupon ${selectSize.value}");
+    print("value of coupon ${selectSizeColor.value}");
+    print("value of coupon ${selectSizeQty.value}");
+    print("value of coupon ${selectSizePrice.value}");
+    print("value of coupon ${selectSizeKey.value}");
+    print("value of coupon ${videoID.toString()}");
+    // try {
+    //   isBuyNowLoading.value = true;
+        var carts = {
+            "id":productId.value,
+            "qty": selectSizeQty.value,
+            "size":selectSize.value,
+            "color":selectSizeColor.value,
+            "size_qty":selectSizeQty.value,
+            "size_price": selectSizePrice.value,
+            "size_key":selectSizeKey.value,
+            "keys":"",
+            "values":"",
+            "prices":"",
+            "video_id": videoID.toString()
+          };
+      BuyNowPassUseCase buyNowPassUseCase =
+      BuyNowPassUseCase(locator<BuyNowRepository>());
+        var response = await buyNowPassUseCase(carts);
+        if (response?.data != null && response?.data is BuyNowModel) {
+          buyNowModel.value = response?.data ?? BuyNowModel();
+          await prefs.setString('buyCart', response?.data?.buyCart ?? '');
+          print("cart ${prefs.getString("buyCart")}");
+          print(response?.data);
+        } else {
+          errorToast(context: navigatorKey.currentContext!, msg: "Something went wrong. Please try again later.");
+        }
+
+    // } catch (e) {
+    //   isBuyNowLoading.value = false;
+    //   print("This is an error: ${e.toString()}");
+    // } finally {
+    //   isBuyNowLoading.value = false;
+    // }
+  }
   Future<void> billingDetails(BuildContext context) async {
     showDialog(
       context: context,
@@ -317,5 +422,75 @@ class ReelsController extends GetxController {
         );
       },
     );
+  }
+  void productInformation(BuildContext context, {required String msg}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // Less curved corners
+          ),
+          title: CustomSimpleText(
+            text: "Missing Information",
+            color: Colors.red,
+            fontSize: AppSizes.size17,
+          ),
+          content: SingleChildScrollView(
+            // Allows the content to scroll if it exceeds available height
+            child: Column(
+              mainAxisSize:
+              MainAxisSize.min, // Ensures dialog adjusts to content height
+              children: [
+                CustomSimpleText(
+                  text: msg,
+                  color: Colors.black,
+                  fontSize: AppSizes.size16,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: CustomSimpleText(
+                alignment: Alignment.centerRight,
+                text: "Close",
+                color: Colors.red,
+                fontSize: AppSizes.size16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  String? getCurrentPrice({List<String>? data}) {
+    if(data?.length == 1){
+      return data?[0];
+    }else{
+      return data?[selectSizeId.value]; // Assuming the same color for all sizes
+    }
+    // return data?[selectSizeId.value]; // Get the price based on the selected index
+  }
+
+  String? getCurrentQty({List<String>? data}) {
+    if(data?.length == 1){
+      return data?[0];
+    }else{
+      return data?[selectSizeId.value]; // Assuming the same color for all sizes
+    }
+    // return data?[selectSizeId.value]; // Get the quantity based on the selected index
+  }
+  //
+  String? getCurrentColor({List<String>? data}) {
+    if(data?.length == 1){
+      return data?[0].replaceAll('#', '0xff');
+    }else{
+    return data?[selectSizeId.value].replaceAll('#', '0xff'); // Assuming the same color for all sizes
+    }
   }
 }

@@ -17,6 +17,7 @@ class CustomElevatedButton extends StatelessWidget {
       bottomRight,
       minimumWidthSize,
       maximumWidthSize, textSize;
+  final bool? loading;
   const CustomElevatedButton({
     super.key,
     this.textColor,
@@ -30,7 +31,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.fontWeight,
     this.maximumWidthSize,
     this.minimumWidthSize,
-    this.textSize,
+    this.textSize, this.loading,
   });
 
   @override
@@ -54,7 +55,9 @@ class CustomElevatedButton extends StatelessWidget {
         ),
       ),
       onPressed: onPress,
-      child: CustomSimpleText(
+      child: loading == true ? Center(
+        child: CircularProgressIndicator(),
+      ) : CustomSimpleText(
         text: text,
         color: textColor ?? Colors.white,
         fontWeight: fontWeight ?? FontWeight.w500,

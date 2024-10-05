@@ -51,38 +51,41 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     if (controller.reelsModel.value.data?.isNotEmpty == true) {
       print("");
 
-      controller.creatorName.value = controller.reelsModel.value
-          .data?[controller.indexFromMyVideo.value].creatorName ??
-          '';
-      controller.catName.value = controller.reelsModel.value
-          .data?[controller.indexFromMyVideo.value].catName ??
-          '';
-      controller.productName.value = controller.reelsModel.value
-          .data?[controller.indexFromMyVideo.value].productName ??
-          '';
-      controller.productPrice.value = controller
-          .reelsModel.value.data?[controller.indexFromMyVideo.value].price
-          .toString() ??
-          "";
-      controller.creatorPhoto.value = controller.reelsModel.value
-              .data?[controller.indexFromMyVideo.value].creatorPhoto ??
-          "";
+
       Random random = Random();
-      int randomNumber = random.nextInt(controller.reelsModel.value.data?.length ?? 0);  // maxLength ensures it's positive
+      int randomNumber = random.nextInt(
+          controller.reelsModel.value.data?.length ??
+              0); // maxLength ensures it's positive
       controller.indexFromMyVideo.value = randomNumber;
       final initialUrl =
           "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
       _initController(
           initialUrl,
           controller
-              .reelsModel.value.data?[controller.indexFromMyVideo.value].id);
+              .reelsModel.value.data?[controller.indexFromMyVideo.value].id,
+          controller
+              .reelsModel.value.data
+      );
     }
   }
 
-  Future<void> _initController(String link, int? id) async {
+  Future<void> _initController(String link, int? id, List<Data>? data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.getString('addToCart');
     print("this is cart ${prefs.getString('cart')}");
+    controller.creatorName.value = data?[controller.indexFromMyVideo.value].creatorName ??
+        '';
+    controller.productId.value = data?[controller.indexFromMyVideo.value].productId.toString() ?? '';
+    controller.catName.value = data?[controller.indexFromMyVideo.value].catName ??
+        '';
+    controller.productName.value = data?[controller.indexFromMyVideo.value].productName ??
+        '';
+    controller.productPrice.value = controller
+        .reelsModel.value.data?[controller.indexFromMyVideo.value].price
+        .toString() ??
+        "";
+    controller.creatorPhoto.value = data?[controller.indexFromMyVideo.value].creatorPhoto ??
+        "";
     _controller = VideoPlayerController.network(link)
       ..addListener(() {
         setState(() {
@@ -112,12 +115,12 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
       });
   }
 
-  Future<void> _onControllerChange(String link, param1) async {
+  Future<void> _onControllerChange(String link, param1, List<Data>? data) async {
     if (_controller != null) {
       final oldController = _controller;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await oldController?.dispose();
-        _initController(link, param1);
+        _initController(link, param1, data);
       });
       setState(() {
         _controller = null;
@@ -127,7 +130,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
         _hasApiCallTriggered = false;
       });
     } else {
-      _initController(link, param1);
+      _initController(link, param1,data);
     }
   }
 
@@ -139,25 +142,20 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
       final id = controller.reelsModel.value.data?[index].id;
       final videoUrl =
           "http://erp.mahfuza-overseas.com/trending-house/$videoData";
-setState(() {
-  controller.creatorName.value = controller.reelsModel.value
-      .data?[index].creatorName ??
-      '';
-  controller.catName.value = controller.reelsModel.value
-      .data?[index].catName ??
-      '';
-  controller.productName.value = controller.reelsModel.value
-      .data?[index].productName ??
-      '';
-  controller.productPrice.value = controller
-      .reelsModel.value.data?[index].price
-      .toString() ??
-      "";
-  controller.creatorPhoto.value = controller.reelsModel.value
-      .data?[index].creatorPhoto ??
-      "";
-});
-      _onControllerChange(videoUrl, id);
+      setState(() {
+        controller.creatorName.value =
+            controller.reelsModel.value.data?[index].creatorName ?? '';
+        controller.catName.value =
+            controller.reelsModel.value.data?[index].catName ?? '';
+        controller.productName.value =
+            controller.reelsModel.value.data?[index].productName ?? '';
+        controller.productPrice.value =
+            controller.reelsModel.value.data?[index].price.toString() ?? "";
+        controller.creatorPhoto.value =
+            controller.reelsModel.value.data?[index].creatorPhoto ?? "";
+        controller.productId.value =  controller.reelsModel.value.data?[controller.indexFromMyVideo.value].productId.toString() ?? '';
+      });
+      _onControllerChange(videoUrl, id, controller.reelsModel.value.data);
     });
   }
 
@@ -238,21 +236,22 @@ setState(() {
                   backgroundColor: Colors.transparent,
                   actions: [
                     PopupMenuButton<DropdownModel>(
-                      icon: Icon(Icons.menu, color: Colors.white),
+                      icon: const Icon(Icons.menu, color: Colors.white),
                       onSelected: (DropdownModel selectedValue) {
                         controller.selectMenu(selectedValue);
-
                       },
                       itemBuilder: (BuildContext context) {
                         return [
                           PopupMenuItem(
                             child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: 200, // Set the height of the dropdown
+                              constraints: const BoxConstraints(
+                                maxHeight:
+                                    200, // Set the height of the dropdown
                               ),
                               child: SingleChildScrollView(
                                 child: Column(
-                                  children: controller.allProductController.popupItemMenu
+                                  children: controller
+                                      .allProductController.popupItemMenu
                                       .map((DropdownModel model) {
                                     return PopupMenuItem<DropdownModel>(
                                       value: model,
@@ -280,274 +279,330 @@ setState(() {
                       _hideControlsTimer?.cancel();
                     });
                   },
-                  child: controller.isLoading.value == true ? const Center(
-                    child: CircularProgressIndicator(),
-                  ) : controller.reelsModel.value.data?.isEmpty ?? false ? CustomSimpleText(text: "No data available", alignment: Alignment.center, color: Colors.white, fontSize: 18,) : GestureDetector(
-                    onTap: _onTap, // Detect taps to show controls
-                    child: PageView.builder(
-                      controller: _pageController,
-                      scrollDirection: Axis.vertical,
-                      onPageChanged: _onPageChanged,
-                      itemCount: controller.reelsModel.value.data?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        final videoData =
-                            controller.reelsModel.value.data?[index];
-                        print("length ${controller.reelsModel.value.data?.length}");
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (_controller != null &&
-                                _controller!.value.isInitialized)
-                              AspectRatio(
-                                aspectRatio: _controller!.value.aspectRatio,
-                                child: VideoPlayer(_controller!),
-                              )
-                            else
-                              const Center(child: CircularProgressIndicator()),
-                            if (_controlsVisible)
-                              Positioned(
-                                bottom: 10,
-                                left: 0,
-                                right: 0,
-                                child: AnimatedOpacity(
-                                  opacity: _controlsVisible ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SliderTheme(
-                                    data: const SliderThemeData(
-                                      thumbShape: RoundSliderThumbShape(
-                                          enabledThumbRadius: 6),
-                                      overlayShape: RoundSliderOverlayShape(
-                                          overlayRadius: 16),
-                                      trackHeight: 1.9,
-                                    ),
-                                    child: Slider(
-                                      value:
-                                          _currentPosition.inSeconds.toDouble(),
-                                      min: 0.0,
-                                      max: _videoDuration.inSeconds.toDouble(),
-                                      activeColor: Colors.white,
-                                      inactiveColor: Colors.grey,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _controller?.seekTo(
-                                              Duration(seconds: value.toInt()));
-                                          // Keep controls visible while user interacts
-                                          _onTap();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if (_controlsVisible)
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                child: AnimatedOpacity(
-                                  opacity: _controlsVisible ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: Center(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        _isPlaying
-                                            ? Icons.pause
-                                            : Icons.play_arrow,
-                                        size: 70,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (_isPlaying) {
-                                            _controller?.pause();
-                                            _isPlaying = false;
-                                          } else {
-                                            _controller?.play();
-                                            _isPlaying = true;
-                                          }
-                                        });
-                                        _onTap(); // Keep controls visible when user interacts
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            // like share comment view
-
-                            Positioned(
-                              right: 0,
-                              bottom: 110,
-                              child: Column(
-                                children: [
-                                  CustomButtonLikeShareComment(
-                                      icon: videoData?.likeStatus == 0
-                                          ? AppAssets.likeNotDone
-                                          : AppAssets.likeDone,
-                                      onPress: () {
-                                        controller
-                                            .likeVideos(
-                                                likeValue:
-                                                    videoData?.likeStatus == 0
-                                                        ? 1
-                                                        : 0,
-                                                videoId: videoData?.id ?? 0)
-                                            .then((value) {
-                                          videoData?.likeStatus =
-                                              videoData?.likeStatus == 0
-                                                  ? 1
-                                                  : 0;
-                                        });
-                                      }),
-                                  CustomButtonLikeShareComment(
-                                      icon: AppAssets.commentsIcon,
-                                      onPress: () {}),
-                                  CustomButtonLikeShareComment(
-                                      icon: AppAssets.share, onPress: () {}),
-                                  CustomButtonLikeShareComment(
-                                      icon: '',
-                                      onPress: () {},
-                                      icons: const Icon(
-                                        Icons.remove_red_eye_outlined,
-                                        size: 23,
-                                      )),
-                                  CustomButtonLikeShareComment(
-                                      icon: '',
-                                      onPress: () {
-                                        controller.addToCartFunction(
-                                            videoData?.productId.toString() ??
-                                                '',
-                                            videoData,
-                                            videoData?.id);
-                                      },
-                                      icons: const Icon(
-                                        Icons.shopping_cart,
-                                        size: 23,
-                                      )),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              bottom: 110,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CustomCachedImageNetwork(
-                                          imageUrl:
-                                              "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/users/${controller.creatorPhoto.value}",
-                                          height: 40,
-                                          weight: 40),
-                                    ),
-                                    10.pw,
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CustomRichText(
-                                          title: controller.creatorName.value,
-                                          titleTextColor: Colors.white,
-                                          heading: "Creator Name: ",
-                                          headingTextColor:
-                                              Colors.white.withOpacity(0.8),
-                                          headingFontSize: AppSizes.size14,
-                                        ),
-                                        Visibility(
-                                          visible:
-                                              controller.catName.value.isEmpty
-                                                  ? false
-                                                  : true,
-                                          child: CustomRichText(
-                                            title: controller.catName.value,
-                                            titleTextColor: Colors.white,
-                                            heading: "Product Category: ",
-                                            headingTextColor:
-                                                Colors.white.withOpacity(0.8),
-                                            headingFontSize: AppSizes.size14,
+                  child: controller.isLoading.value == true
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : controller.reelsModel.value.data?.isEmpty ?? false
+                          ? const CustomSimpleText(
+                              text: "No data available",
+                              alignment: Alignment.center,
+                              color: Colors.white,
+                              fontSize: 18,
+                            )
+                          : GestureDetector(
+                              onTap: _onTap, // Detect taps to show controls
+                              child: PageView.builder(
+                                controller: _pageController,
+                                scrollDirection: Axis.vertical,
+                                onPageChanged: _onPageChanged,
+                                itemCount:
+                                    controller.reelsModel.value.data?.length ??
+                                        0,
+                                itemBuilder: (context, index) {
+                                  final videoData =
+                                      controller.reelsModel.value.data?[index];
+                                  print(
+                                      "length ${controller.reelsModel.value.data?.length}");
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      if (_controller != null &&
+                                          _controller!.value.isInitialized)
+                                        AspectRatio(
+                                          aspectRatio:
+                                              _controller!.value.aspectRatio,
+                                          child: VideoPlayer(_controller!),
+                                        )
+                                      else
+                                        const Center(
+                                            child: CircularProgressIndicator()),
+                                      if (_controlsVisible)
+                                        Positioned(
+                                          bottom: 10,
+                                          left: 0,
+                                          right: 0,
+                                          child: AnimatedOpacity(
+                                            opacity:
+                                                _controlsVisible ? 1.0 : 0.0,
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                            child: SliderTheme(
+                                              data: const SliderThemeData(
+                                                thumbShape:
+                                                    RoundSliderThumbShape(
+                                                        enabledThumbRadius: 6),
+                                                overlayShape:
+                                                    RoundSliderOverlayShape(
+                                                        overlayRadius: 16),
+                                                trackHeight: 1.9,
+                                              ),
+                                              child: Slider(
+                                                value: _currentPosition
+                                                    .inSeconds
+                                                    .toDouble(),
+                                                min: 0.0,
+                                                max: _videoDuration.inSeconds
+                                                    .toDouble(),
+                                                activeColor: Colors.white,
+                                                inactiveColor: Colors.grey,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _controller?.seekTo(
+                                                        Duration(
+                                                            seconds:
+                                                                value.toInt()));
+                                                    // Keep controls visible while user interacts
+                                                    _onTap();
+                                                  });
+                                                },
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomSimpleText(
-                                              text: "Product Name: ",
-                                              color:
-                                                  Colors.white.withOpacity(0.8),
-                                              fontSize: AppSizes.size14,
+                                      if (_controlsVisible)
+                                        Positioned(
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          top: 0,
+                                          child: AnimatedOpacity(
+                                            opacity:
+                                                _controlsVisible ? 1.0 : 0.0,
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                            child: Center(
+                                              child: IconButton(
+                                                icon: Icon(
+                                                  _isPlaying
+                                                      ? Icons.pause
+                                                      : Icons.play_arrow,
+                                                  size: 70,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if (_isPlaying) {
+                                                      _controller?.pause();
+                                                      _isPlaying = false;
+                                                    } else {
+                                                      _controller?.play();
+                                                      _isPlaying = true;
+                                                    }
+                                                  });
+                                                  _onTap(); // Keep controls visible when user interacts
+                                                },
+                                              ),
                                             ),
-                                            SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.5,
-                                                child: CustomSimpleText(
-                                                  text: controller
-                                                      .productName.value,
-                                                  color: AppColors.white,
-                                                  maxLines: 1,
+                                          ),
+                                        ),
+
+                                      // like share comment view
+
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 110,
+                                        child: Column(
+                                          children: [
+                                            CustomButtonLikeShareComment(
+                                                icon: videoData?.likeStatus == 0
+                                                    ? AppAssets.likeNotDone
+                                                    : AppAssets.likeDone,
+                                                onPress: () {
+                                                  controller
+                                                      .likeVideos(
+                                                          likeValue: videoData
+                                                                      ?.likeStatus ==
+                                                                  0
+                                                              ? 1
+                                                              : 0,
+                                                          videoId:
+                                                              videoData?.id ??
+                                                                  0)
+                                                      .then((value) {
+                                                    videoData?.likeStatus =
+                                                        videoData?.likeStatus ==
+                                                                0
+                                                            ? 1
+                                                            : 0;
+                                                  });
+                                                }),
+                                            CustomButtonLikeShareComment(
+                                                icon: AppAssets.commentsIcon,
+                                                onPress: () {}),
+                                            CustomButtonLikeShareComment(
+                                                icon: AppAssets.share,
+                                                onPress: () {}),
+                                            CustomButtonLikeShareComment(
+                                                icon: '',
+                                                onPress: () {},
+                                                icons: const Icon(
+                                                  Icons.remove_red_eye_outlined,
+                                                  size: 23,
+                                                )),
+                                            CustomButtonLikeShareComment(
+                                                icon: '',
+                                                onPress: () {
+                                                  controller.addToCartFunction(
+                                                      videoData?.productId
+                                                              .toString() ??
+                                                          '',
+                                                      videoData,
+                                                      videoData?.id);
+                                                },
+                                                icons: const Icon(
+                                                  Icons.shopping_cart,
+                                                  size: 23,
                                                 )),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                      Positioned(
+                                        left: 0,
+                                        bottom: 110,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Row(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                                child: CustomCachedImageNetwork(
+                                                    imageUrl:
+                                                        "${NetworkConfiguration.baseUrl.replaceAll("api/", '')}assets/images/users/${controller.creatorPhoto.value}",
+                                                    height: 40,
+                                                    weight: 40),
+                                              ),
+                                              10.pw,
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomRichText(
+                                                    title: controller
+                                                        .creatorName.value,
+                                                    titleTextColor:
+                                                        Colors.white,
+                                                    heading: "Creator Name: ",
+                                                    headingTextColor: Colors
+                                                        .white
+                                                        .withOpacity(0.8),
+                                                    headingFontSize:
+                                                        AppSizes.size14,
+                                                  ),
+                                                  Visibility(
+                                                    visible: controller.catName
+                                                            .value.isEmpty
+                                                        ? false
+                                                        : true,
+                                                    child: CustomRichText(
+                                                      title: controller
+                                                          .catName.value,
+                                                      titleTextColor:
+                                                          Colors.white,
+                                                      heading:
+                                                          "Product Category: ",
+                                                      headingTextColor: Colors
+                                                          .white
+                                                          .withOpacity(0.8),
+                                                      headingFontSize:
+                                                          AppSizes.size14,
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      CustomSimpleText(
+                                                        text: "Product Name: ",
+                                                        color: Colors.white
+                                                            .withOpacity(0.8),
+                                                        fontSize:
+                                                            AppSizes.size14,
+                                                      ),
+                                                      SizedBox(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.5,
+                                                          child:
+                                                              CustomSimpleText(
+                                                            text: controller
+                                                                .productName
+                                                                .value,
+                                                            color:
+                                                                AppColors.white,
+                                                            maxLines: 1,
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 40,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: 37,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  color: Colors.yellow),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20),
+                                                child: CustomSimpleText(
+                                                    text:
+                                                        "৳${controller.productPrice.value}"),
+                                              ),
+                                            ),
+                                            20.pw,
+                                            CustomElevatedButton(
+                                              hexColor: Colors.white,
+                                              textColor: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              text: "Order Now",
+                                              topRightRadius: 5,
+                                              bottomLeftRadius: 5,
+                                              topLeft: 5,
+                                              bottomRight: 5,
+                                              onPress: () async {
+                                                // SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                // prefs.remove("buyCart");
+                                                print("product id ${controller.productId.value}");
+                                                confirmationDialog(
+                                                    context, videoData);
+                                                controller.selectSizeColor
+                                                    .value = '';
+                                                controller.priceSum.value =
+                                                    controller.price.value;
+
+                                                // RouteGenerator.pushNamed(context, Routes.homepage);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Positioned(
+                                      //   top: 0,
+                                      //     right: 0,
+                                      //     child:
+                                      // )
+                                    ],
+                                  );
+                                },
                               ),
                             ),
-                            Positioned(
-                              bottom: 40,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 37,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        color: Colors.yellow),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: CustomSimpleText(
-                                          text:
-                                              "৳${controller.productPrice.value}"),
-                                    ),
-                                  ),
-                                  20.pw,
-                                  CustomElevatedButton(
-                                    hexColor: Colors.white,
-                                    textColor: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    text: "Order Now",
-                                    topRightRadius: 5,
-                                    bottomLeftRadius: 5,
-                                    topLeft: 5,
-                                    bottomRight: 5,
-                                    onPress: () {
-                                      confirmationDialog(context, videoData);
-                                      controller.priceSum.value =
-                                          controller.price.value;
-                                      // RouteGenerator.pushNamed(context, Routes.homepage);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Positioned(
-                            //   top: 0,
-                            //     right: 0,
-                            //     child:
-                            // )
-                          ],
-                        );
-                      },
-                    ),
-                  ),
                 ),
               ));
         });
@@ -572,7 +627,7 @@ setState(() {
 
   Widget CustomContainer({required String value}) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: AppColors.deepGrey),
@@ -630,36 +685,17 @@ setState(() {
                 fontSize: AppSizes.size18,
                 color: AppColors.black,
               ),
-              Row(
-                children: [
-                  InkWell(
-                      onTap: () {
-                        if (controller.orderNumber.value > 1) {
-                          controller.orderNumber.value--;
-                          controller.priceSum.value -= controller.price.value;
-                        }
-                      },
-                      child: CustomContainer(value: "-")),
-                  5.pw,
-                  CustomContainer(
-                        value: "${controller.orderNumber.value}"),
-
-                  5.pw,
-                  InkWell(
-                      onTap: () {
-                        controller.orderNumber.value++;
-                        controller.priceSum.value += controller.price.value;
-                      },
-                      child: CustomContainer(value: "+")),
-                ],
-              )
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Column(
@@ -690,29 +726,152 @@ setState(() {
                   ),
                   const SizedBox(
                       width: 10), // Add some spacing between the two columns
-                  Flexible(
+                  Expanded(
                     flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        const CustomSimpleText(
+                          text: "SIZE",
+                          textDecoration: TextDecoration.none,
+                          alignment: Alignment.centerLeft,
+                          textAlign: TextAlign.start,
+                        ),
+                        // Wrap ListView.builder in SizedBox to give it a fixed height
+                        SizedBox(
+                          height: 30,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: videoData?.size?.length ?? 0,
+                            itemBuilder: (_, index) {
+                              String item = videoData?.size?[index] ?? '';
+                              return Obx(() => Row(
+                                    children: [
+                                      Radio<String>(
+                                        value: item,
+                                        groupValue: controller.selectSize
+                                            .value, // Make sure this is RxString
+                                        onChanged: (String? value) {
+                                          controller.selectSize.value = value!;
+                                          controller.selectSizeId.value =
+                                              index!;
+                                          controller.selectSizePrice.value =
+                                              controller.getCurrentPrice(
+                                                      data: videoData
+                                                          ?.sizePrice) ??
+                                                  '';
+                                          controller.selectSizeColor.value =
+                                              controller.getCurrentColor(
+                                                      data: videoData?.color) ??
+                                                  '';
+                                          controller.selectSizeQty.value =
+                                              controller.getCurrentColor(
+                                                      data:
+                                                          videoData?.sizeQty) ??
+                                                  '';
+                                          controller.selectSizeKey.value =
+                                              index.toString();
+                                          controller.totalMRP.value = int.parse(
+                                              controller.getCurrentPrice(
+                                                      data: videoData
+                                                          ?.sizePrice) ??
+                                                  '');
+                                          print(
+                                              "Selected size: ${controller.selectSize.value} ${controller.selectSizeColor.value} ${controller.selectSizeQty.value}");
+                                        },
+                                      ),
+                                      CustomSimpleText(
+                                        text: item, // "XL", "M", etc.
+                                        textDecoration: TextDecoration.none,
+                                        alignment: Alignment.center,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ));
+                            },
+                          ),
+                        ),
+                        Obx(
+                          () => CustomSimpleText(
+                              text:
+                                  "Price: ${controller.getCurrentPrice(data: videoData?.sizePrice)}"),
+                        ),
+                        Obx(
+                          () => CustomSimpleText(
+                              text:
+                                  "Quantity: ${controller.getCurrentQty(data: videoData?.sizeQty)}"),
+                        ),
+                        SizedBox(
+                          height: 30,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: videoData?.color?.length,
+                              itemBuilder: (_, index) {
+                                var item = videoData?.color?[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: InkWell(
+                                    onTap: () {
+                                      controller.selectSizeColor.value =
+                                          item ?? '';
+                                    },
+                                    child: Center(
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Obx(() => Container(
+                                              height: 20,
+                                              width: 20,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  color: HexColor(item ?? '')),
+                                              child: controller.selectSizeColor
+                                                          .value !=
+                                                      item
+                                                  ? SizedBox.shrink()
+                                                  : Center(
+                                                    child: Icon(
+                                                        Icons.check,
+                                                        color: Colors.white,
+                                                      size: 17,
+                                                      ),
+                                                  ),
+                                            )),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                        ),
                         CustomSimpleText(
                           text: "Price Details",
                           fontWeight: FontWeight.bold,
                           fontSize: AppSizes.size16,
                           color: AppColors.black,
                         ),
-                         CustomRow(
-                              title: "Total MRP",
-                              price: "৳${videoData?.price}"),
-                        Divider(
-                          color: AppColors.backgroundColor,
+                        Obx(
+                          () => CustomRow(
+                            title: "Total MRP",
+                            price:
+                                "৳${int.parse(controller.getCurrentPrice(data: videoData?.sizePrice) ?? '')}",
+                          ),
                         ),
-                         CustomRow(
-                              title: "Total ",
-                              price: "৳${videoData?.price}"),
-
+                        Divider(color: AppColors.backgroundColor),
+                        Obx(
+                          () => CustomRow(
+                            title: "Total ",
+                            price:
+                                "৳${int.parse(controller.getCurrentPrice(data: videoData?.sizePrice) ?? '')}",
+                          ),
+                        ),
                         10.ph,
                         CustomSimpleText(
                           text: "HAVE A PROMOTION CODE?",
@@ -722,26 +881,29 @@ setState(() {
                           textDecoration: TextDecoration.underline,
                         ),
                         10.ph,
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                            controller.billingDetails(context);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: AppColors.backgroundColor),
-                            child: CustomSimpleText(
-                              text: "Place Order",
-                              fontWeight: FontWeight.bold,
-                              fontSize: AppSizes.size14,
-                              color: AppColors.white,
-                              textDecoration: TextDecoration.underline,
-                              alignment: Alignment.center,
-                            ),
+                      Obx(()=> controller.isBuyNowLoading.value ? const Center(child: CircularProgressIndicator(),) :  InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          controller.billingDetails(context);
+                          controller.buyNowFunction(videoID: videoData?.id).then((value){
+                          controller.homeController.checkOutFunction(from: "singleCheckout");
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.backgroundColor),
+                          child: CustomSimpleText(
+                            text: "Place Order",
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppSizes.size14,
+                            color: AppColors.white,
+                            textDecoration: TextDecoration.underline,
+                            alignment: Alignment.center,
                           ),
-                        )
+                        ),
+                      )),
                       ],
                     ),
                   ),
@@ -763,10 +925,7 @@ setState(() {
                   10.pw,
                   IconButton(
                       onPressed: () {},
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                      ))
+                      icon: const Icon(Icons.arrow_forward_ios, size: 15))
                 ],
               ),
             ],

@@ -1,6 +1,7 @@
 import '../../../../../../core/source/model/api_response.dart';
 import '../../domain/repository/reels_repository.dart';
 import '../model/add_to_cart_model.dart';
+import '../model/by_now_model.dart';
 import '../model/cart_item_delete_model.dart';
 import '../model/like_model.dart';
 import '../model/reels_model.dart';
@@ -42,6 +43,16 @@ class RemoveToCartRepositoryImpl extends RemoveToCartRepository {
   Future<Response<CartItemDeleteModel>?> removeToCart(String productId, String cart) async {
     Response<CartItemDeleteModel>? apiResponse;
     apiResponse = await reelsService.removeToCart(productId, cart);
+    return apiResponse;
+  }
+}
+class BuyNowRepositoryImpl extends BuyNowRepository {
+  BuyNowRepositoryImpl(super.reelsService);
+
+  @override
+  Future<Response<BuyNowModel>?> buyNow(Map<String, Object> data) async {
+    Response<BuyNowModel>? apiResponse;
+    apiResponse = await reelsService.buyNow(data);
     return apiResponse;
   }
 }

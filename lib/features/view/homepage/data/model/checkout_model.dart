@@ -1,3 +1,13 @@
+// To parse this JSON data, do
+//
+//     final checkoutModel = checkoutModelFromJson(jsonString);
+
+import 'dart:convert';
+
+CheckoutModel checkoutModelFromJson(String str) => CheckoutModel.fromJson(json.decode(str));
+
+String checkoutModelToJson(CheckoutModel data) => json.encode(data.toJson());
+
 class CheckoutModel {
   Products? products;
   int? totalPrice;
@@ -123,37 +133,38 @@ class Datum {
 }
 
 class Products {
-  The200 the200;
+  The201XLe12F2F? the201XLe12F2F;
 
   Products({
-    required this.the200,
+    required this.the201XLe12F2F,
   });
 
   factory Products.fromJson(Map<String, dynamic> json) => Products(
-    the200: The200.fromJson(json["200"]),
+    the201XLe12F2F: json["201XLe12f2f"] != null ? The201XLe12F2F.fromJson(json["201XLe12f2f"]) : null, // Null check
   );
 
   Map<String, dynamic> toJson() => {
-    "200": the200.toJson(),
+    "201XLe12f2f": the201XLe12F2F?.toJson(),
   };
 }
 
-class The200 {
+class The201XLe12F2F {
   int qty;
   int sizeKey;
   String sizeQty;
   String sizePrice;
   String size;
   String color;
-  int stock;
+  dynamic stock;
   int price;
   Item item;
   String license;
   String dp;
   String keys;
   String values;
+  String videoId;
 
-  The200({
+  The201XLe12F2F({
     required this.qty,
     required this.sizeKey,
     required this.sizeQty,
@@ -167,9 +178,10 @@ class The200 {
     required this.dp,
     required this.keys,
     required this.values,
+    required this.videoId,
   });
 
-  factory The200.fromJson(Map<String, dynamic> json) => The200(
+  factory The201XLe12F2F.fromJson(Map<String, dynamic> json) => The201XLe12F2F(
     qty: json["qty"],
     sizeKey: json["size_key"],
     sizeQty: json["size_qty"],
@@ -183,6 +195,7 @@ class The200 {
     dp: json["dp"],
     keys: json["keys"],
     values: json["values"],
+    videoId: json["video_id"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -199,6 +212,7 @@ class The200 {
     "dp": dp,
     "keys": keys,
     "values": values,
+    "video_id": videoId,
   };
 }
 
@@ -208,20 +222,20 @@ class Item {
   String slug;
   String name;
   String photo;
-  String size;
-  String sizeQty;
-  String sizePrice;
-  String color;
+  List<String> size;
+  List<String> sizeQty;
+  List<String> sizePrice;
+  List<String> color;
   int price;
-  int stock;
+  dynamic stock;
   String type;
   dynamic file;
   dynamic link;
   String license;
   String licenseQty;
   dynamic measure;
-  String wholeSellQty;
-  String wholeSellDiscount;
+  List<String> wholeSellQty;
+  List<String> wholeSellDiscount;
   dynamic attributes;
 
   Item({
@@ -253,10 +267,10 @@ class Item {
     slug: json["slug"],
     name: json["name"],
     photo: json["photo"],
-    size: json["size"],
-    sizeQty: json["size_qty"],
-    sizePrice: json["size_price"],
-    color: json["color"],
+    size: List<String>.from(json["size"].map((x) => x)),
+    sizeQty: List<String>.from(json["size_qty"].map((x) => x)),
+    sizePrice: List<String>.from(json["size_price"].map((x) => x)),
+    color: List<String>.from(json["color"].map((x) => x)),
     price: json["price"],
     stock: json["stock"],
     type: json["type"],
@@ -265,8 +279,8 @@ class Item {
     license: json["license"],
     licenseQty: json["license_qty"],
     measure: json["measure"],
-    wholeSellQty: json["whole_sell_qty"],
-    wholeSellDiscount: json["whole_sell_discount"],
+    wholeSellQty: List<String>.from(json["whole_sell_qty"].map((x) => x)),
+    wholeSellDiscount: List<String>.from(json["whole_sell_discount"].map((x) => x)),
     attributes: json["attributes"],
   );
 
@@ -276,10 +290,10 @@ class Item {
     "slug": slug,
     "name": name,
     "photo": photo,
-    "size": size,
-    "size_qty": sizeQty,
-    "size_price": sizePrice,
-    "color": color,
+    "size": List<dynamic>.from(size.map((x) => x)),
+    "size_qty": List<dynamic>.from(sizeQty.map((x) => x)),
+    "size_price": List<dynamic>.from(sizePrice.map((x) => x)),
+    "color": List<dynamic>.from(color.map((x) => x)),
     "price": price,
     "stock": stock,
     "type": type,
@@ -288,8 +302,8 @@ class Item {
     "license": license,
     "license_qty": licenseQty,
     "measure": measure,
-    "whole_sell_qty": wholeSellQty,
-    "whole_sell_discount": wholeSellDiscount,
+    "whole_sell_qty": List<dynamic>.from(wholeSellQty.map((x) => x)),
+    "whole_sell_discount": List<dynamic>.from(wholeSellDiscount.map((x) => x)),
     "attributes": attributes,
   };
 }

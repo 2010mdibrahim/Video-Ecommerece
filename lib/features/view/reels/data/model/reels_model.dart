@@ -52,10 +52,10 @@ class Data {
   String? productName;
   String? productPhoto;
   String? productThumbnail;
-  Null? size;
-  Null? sizeQty;
-  Null? sizePrice;
-  Null? color;
+  List<String>? size;
+  List<String>? sizeQty;
+  List<String>? sizePrice;
+  List<String>? color;
   int? price;
   int? previousPrice;
   String? details;
@@ -63,6 +63,7 @@ class Data {
   String? catName;
   String? catPhoto;
   int? likeStatus;
+  String? shareUrl;
 
   Data(
       {this.id,
@@ -99,7 +100,8 @@ class Data {
         this.stock,
         this.catName,
         this.catPhoto,
-        this.likeStatus});
+        this.likeStatus,
+        this.shareUrl});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -126,10 +128,10 @@ class Data {
     productName = json['product_name'];
     productPhoto = json['product_photo'];
     productThumbnail = json['product_thumbnail'];
-    size = json['size'];
-    sizeQty = json['size_qty'];
-    sizePrice = json['size_price'];
-    color = json['color'];
+    size = json['size'].cast<String>();
+    sizeQty = json['size_qty'].cast<String>();
+    sizePrice = json['size_price'].cast<String>();
+    color = json['color'].cast<String>();
     price = json['price'];
     previousPrice = json['previous_price'];
     details = json['details'];
@@ -137,6 +139,7 @@ class Data {
     catName = json['cat_name'];
     catPhoto = json['cat_photo'];
     likeStatus = json['like_status'];
+    shareUrl = json['share_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -176,6 +179,7 @@ class Data {
     data['cat_name'] = this.catName;
     data['cat_photo'] = this.catPhoto;
     data['like_status'] = this.likeStatus;
+    data['share_url'] = this.shareUrl;
     return data;
   }
 }

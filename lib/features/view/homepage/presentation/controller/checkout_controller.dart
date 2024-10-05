@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:e_commerce/core/core/extensions/extensions.dart';
 import 'package:e_commerce/features/view/authentication/sign_in/data/model/login_model.dart';
+import 'package:e_commerce/features/view/homepage/presentation/controller/home_controller.dart';
 import 'package:e_commerce/features/view/homepage/presentation/widget/billing_information_widget.dart';
 import 'package:e_commerce/features/widget/custom_toast/custom_toast.dart';
 import 'package:e_commerce/main.dart';
@@ -46,27 +47,33 @@ mixin CheckoutController on GetxController {
   var packagingSelectedValueId = 1.obs;
   var isContinueClicked = false.obs;
   var shippingDifferentAddress = false.obs;
-  checkOutFunction() async {
+  // var homeController = locator<HomeController>();
+  checkOutFunction({ String? from}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
+    // try {
       isCheckOutDataLoding.value = true;
-      var carts = {"cart": prefs.getString('cart') ?? ''};
+      print("from which $from");
+      var carts = {"cart": from == "singleCheckout" ? (prefs.getString("buyCart") ?? '') : prefs.getString('cart') ?? ''};
       CheckOutPassUseCase homePassUseCase =
           CheckOutPassUseCase(locator<HomeRepository>());
       var response = await homePassUseCase(data: carts);
       if (response?.data != null && response?.data is CheckoutModel) {
         checkoutModel.value = response?.data ?? CheckoutModel();
+        print("checkout model ${prefs.getString("buyCart") ?? ''}");
+        print("checkout model ${checkoutModel.value.totalQty}");
+        print("checkout model ${checkoutModel.value.totalPrice}");
+        print("checkout model ${checkoutModel.value.products?.the201XLe12F2F?.color}");
         billingDetails(navigatorKey.currentContext!, checkoutModel.value);
         print(response?.data);
       } else {
         print('No data fo-und');
       }
-    } catch (e) {
-      isCheckOutDataLoding.value = false;
-      print("This is an error: ${e.toString()}");
-    } finally {
-      isCheckOutDataLoding.value = false;
-    }
+    // } catch (e) {
+    //   isCheckOutDataLoding.value = false;
+    //   print("This is an error: ${e.toString()}");
+    // } finally {
+    //   isCheckOutDataLoding.value = false;
+    // }
   }
 
   couponCodeFunction() async {
@@ -107,7 +114,10 @@ mixin CheckoutController on GetxController {
     print("value of coupon");
     try {
       isCashOnDeliveryLoading.value = true;
+      print("name ${session.getFullName}");
       print("name ${session.getPhoneNumber}");
+      print("name ${session.getAddress}");
+
       var carts = {
         "shipping": "shipto",
         "name": session.getFullName ?? '',
@@ -131,21 +141,28 @@ mixin CheckoutController on GetxController {
             checkoutModel.value.totalPrice.toString() ??
             '',
         "coupon_code": couponCodeController.value.text ?? '',
-        "coupon_id": couponCodeModel.value.couponId.toString() ?? '',
-        "user_id": loginModel.value.data?.id.toString() ?? '',
+        "coupon_id": couponCodeModel.value.couponId ?? 0,
+        "user_id": session.getId ?? '',
         "cart": prefs.getString('cart') ?? ''
       };
+      print("name ${carts}");
       CashOnDeliveryPassUseCase cashOnDeliveryPassUseCase =
           CashOnDeliveryPassUseCase(locator<HomeRepository>());
       var response = await cashOnDeliveryPassUseCase(data: carts);
       if (response?.data != null && response?.data is CashonDeliveryModel) {
         cashOnDeliveryModel.value = response?.data ?? CashonDeliveryModel();
-        prefs.remove('addToCart');
-        prefs.remove('cart');
-        couponCodeModel.value = CouponCodeModel();
-        addByOneModel.value = AddByOneModel();
-        homeAddToCartModel.value = HomeAddToCartModel();
-        checkoutModel.value = CheckoutModel();
+        Future.delayed(Duration(seconds: 2),(){
+          prefs.remove('addToCart');
+          prefs.remove('cart');
+        });
+
+        // couponCodeModel.value = CouponCodeModel();
+        // addByOneModel.value = AddByOneModel();
+        // homeAddToCartModel.value = HomeAddToCartModel();
+        // checkoutModel.value = CheckoutModel();
+        Navigator.pop(navigatorKey.currentContext!);
+        homeAddToCartModel
+            .value.products?.clear();
       }
     } catch (e) {
       isCashOnDeliveryLoading.value = false;
@@ -325,7 +342,7 @@ mixin CheckoutController on GetxController {
   }
 
   Future<void> billingDetails(
-      BuildContext context, CheckoutModel addToCartModel) async {
+      BuildContext context, CheckoutModel checkoutModel) async {
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   // Ensure this happens after the first frame is built
     //   shippingSelectedValue.value =
@@ -359,7 +376,7 @@ mixin CheckoutController on GetxController {
                     isContinueClicked.value == true
                         ? InformationWidget()
                         : BillingInformationWidget(
-                            checkoutModel: addToCartModel),
+                            checkoutModel: checkoutModel),
                     10.ph,
                     ShippingMethodWidget(),
                     Divider(),
@@ -374,7 +391,7 @@ mixin CheckoutController on GetxController {
                         ),
                         Obx(() => CustomSimpleText(
                               text: couponCodeModel.value.totalPrice == null
-                                  ? "${(addToCartModel.totalPrice?.toInt() ?? 0) + (shippingSelectedValue.value.toInt()) + (packagingSelectedValue.value.toInt())}"
+                                  ? "${(checkoutModel.totalPrice?.toInt() ?? 0) + (shippingSelectedValue.value.toInt()) + (packagingSelectedValue.value.toInt())}"
                                   : couponCodeModel.value.totalPrice.toString(),
                               fontWeight: FontWeight.bold,
                               fontSize: AppSizes.size13,
@@ -409,7 +426,22 @@ mixin CheckoutController on GetxController {
                                   ),
                                 ),
                               ),
-                              Align(
+                             isContinueClicked.value == true? Align(
+                               alignment: Alignment.bottomRight,
+                               child: SizedBox(
+                                 width:
+                                 MediaQuery.of(context).size.width * 0.3,
+                                 child: CustomElevatedButton(
+                                   text: "Continue",
+                                   topLeft: 10,
+                                   bottomRight: 10,
+                                   loading: isCashOnDeliveryLoading.value,
+                                   onPress: () {
+                                       cashOnDeliveryFunction();
+                                   },
+                                 ),
+                               ),
+                             ) : Align(
                                 alignment: Alignment.bottomRight,
                                 child: SizedBox(
                                   width:
@@ -441,7 +473,6 @@ mixin CheckoutController on GetxController {
                                             msg: "Please Enter address");
                                       } else {
                                         isContinueClicked.value = true;
-                                        cashOnDeliveryFunction();
                                       }
                                     },
                                   ),
