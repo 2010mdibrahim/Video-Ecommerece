@@ -50,7 +50,7 @@ mixin CheckoutController on GetxController {
   // var homeController = locator<HomeController>();
   checkOutFunction({ String? from}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // try {
+    try {
       isCheckOutDataLoding.value = true;
       print("from which $from");
       var carts = {"cart": from == "singleCheckout" ? (prefs.getString("buyCart") ?? '') : prefs.getString('cart') ?? ''};
@@ -63,17 +63,17 @@ mixin CheckoutController on GetxController {
         print("checkout model ${checkoutModel.value.totalQty}");
         print("checkout model ${checkoutModel.value.totalPrice}");
         print("checkout model ${checkoutModel.value.products?.the201XLe12F2F?.color}");
-        billingDetails(navigatorKey.currentContext!, checkoutModel.value);
+        billingDetails(navigatorKey.currentContext!, checkoutModel.value, from);
         print(response?.data);
       } else {
         print('No data fo-und');
       }
-    // } catch (e) {
-    //   isCheckOutDataLoding.value = false;
-    //   print("This is an error: ${e.toString()}");
-    // } finally {
-    //   isCheckOutDataLoding.value = false;
-    // }
+    } catch (e) {
+      isCheckOutDataLoding.value = false;
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isCheckOutDataLoding.value = false;
+    }
   }
 
   couponCodeFunction() async {
@@ -109,11 +109,11 @@ mixin CheckoutController on GetxController {
     }
   }
 
-  cashOnDeliveryFunction() async {
+  cashOnDeliveryFunction({String? from}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print("value of coupon");
-    try {
-      isCashOnDeliveryLoading.value = true;
+    // try {
+    //   isCashOnDeliveryLoading.value = true;
       print("name ${session.getFullName}");
       print("name ${session.getPhoneNumber}");
       print("name ${session.getAddress}");
@@ -125,15 +125,15 @@ mixin CheckoutController on GetxController {
         "address": session.getAddress ?? '',
         "customer_country": "Bangladesh",
         "shipping_country": "Bangladesh",
-        "shipping_name": fullNameController.value.text ?? '',
-        "shipping_phone": phoneNumberController.value.text ?? '',
-        "shipping_address": detailAddressController.value.text ?? '',
-        "order_notes": orderNotesController.value.text ?? '',
+        "shipping_name":     fullNameController.value.text ?? '',
+        "shipping_phone":    phoneNumberController.value.text ?? '',
+        "shipping_address":  detailAddressController.value.text ?? '',
+        "order_notes":       orderNotesController.value.text ?? '',
         "method": "Cash On Delivery",
         "shipping_cost": shippingSelectedValue.value.toString() ?? '',
         "packing_cost": packagingSelectedValue.value.toString() ?? '',
         "dp": checkoutModel.value.digital.toString() ?? '',
-        "tax": homeAddToCartModel.value.tx.toString() ?? '',
+        "tax": from == "singleCheckout" ? "0" : homeAddToCartModel.value.tx.toString() ?? '',
         "totalQty": checkoutModel.value.totalQty.toString() ?? '',
         "vendor_shipping_id": shippingSelectedValueId.value.toString() ?? '',
         "vendor_packing_id": packagingSelectedValueId.value.toString() ?? '',
@@ -143,7 +143,7 @@ mixin CheckoutController on GetxController {
         "coupon_code": couponCodeController.value.text ?? '',
         "coupon_id": couponCodeModel.value.couponId ?? 0,
         "user_id": session.getId ?? '',
-        "cart": prefs.getString('cart') ?? ''
+        "cart": from == "singleCheckout" ? (prefs.getString("buyCart") ?? '') : prefs.getString('cart') ?? ''
       };
       print("name ${carts}");
       CashOnDeliveryPassUseCase cashOnDeliveryPassUseCase =
@@ -154,6 +154,9 @@ mixin CheckoutController on GetxController {
         Future.delayed(Duration(seconds: 2),(){
           prefs.remove('addToCart');
           prefs.remove('cart');
+          if(from == "singleCheckout"){
+            prefs.remove("buyCart");
+          }
         });
 
         // couponCodeModel.value = CouponCodeModel();
@@ -164,14 +167,19 @@ mixin CheckoutController on GetxController {
         homeAddToCartModel
             .value.products?.clear();
       }
-    } catch (e) {
-      isCashOnDeliveryLoading.value = false;
-      print("This is an error: ${e.toString()}");
-    } finally {
-      isCashOnDeliveryLoading.value = false;
-    }
+    // } catch (e) {
+    //   isCashOnDeliveryLoading.value = false;
+    //   print("This is an error: ${e.toString()}");
+    // } finally {
+    //   isCashOnDeliveryLoading.value = false;
+    // }
   }
-
+cleardata(){
+  fullNameController.value.clear();
+  phoneNumberController.value.clear();
+  detailAddressController.value.clear();
+  orderNotesController.value.clear();
+}
   Future<void> confirmationDialog(
     BuildContext context,
     HomeAddToCartModel addToCartModel,
@@ -342,7 +350,7 @@ mixin CheckoutController on GetxController {
   }
 
   Future<void> billingDetails(
-      BuildContext context, CheckoutModel checkoutModel) async {
+      BuildContext context, CheckoutModel checkoutModel, String? from) async {
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   // Ensure this happens after the first frame is built
     //   shippingSelectedValue.value =
@@ -437,7 +445,7 @@ mixin CheckoutController on GetxController {
                                    bottomRight: 10,
                                    loading: isCashOnDeliveryLoading.value,
                                    onPress: () {
-                                       cashOnDeliveryFunction();
+                                       cashOnDeliveryFunction(from: from);
                                    },
                                  ),
                                ),

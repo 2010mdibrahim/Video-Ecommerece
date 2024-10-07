@@ -32,7 +32,7 @@ class Order {
   int? payAmount;
   String? method;
   String? shipping;
-  Null? pickupLocation;
+  String? pickupLocation;
   String? customerEmail;
   String? customerName;
   String? shippingCost;
@@ -44,8 +44,8 @@ class Order {
   String? customerCountry;
   String? customerCity;
   String? customerZip;
-  Null? shippingEmail;
-  Null? shippingName;
+  String? shippingEmail;
+  String? shippingName;
   String? shippingPhone;
   String? shippingAddress;
   String? shippingCountry;

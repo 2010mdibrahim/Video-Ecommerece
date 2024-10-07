@@ -47,11 +47,12 @@ class ReelsController extends GetxController {
   var price = 100.obs;
   var priceSum = 0.obs;
   var totalMRP = 0.obs;
-  var fullNameController = TextEditingController().obs;
-  var phoneNumberController = TextEditingController().obs;
-  var detailAddressController = TextEditingController().obs;
-  var orderNotesController = TextEditingController().obs;
-  var couponCodeController = TextEditingController().obs;
+  var quantity = 0.obs;
+  // var fullNameController = TextEditingController().obs;
+  // var phoneNumberController = TextEditingController().obs;
+  // var detailAddressController = TextEditingController().obs;
+  // var orderNotesController = TextEditingController().obs;
+  // var couponCodeController = TextEditingController().obs;
   var shippingSelectedValue = 0.obs;
   var shippingSelectedValueId = 0.obs;
   var packagingSelectedValue = 1.obs;
@@ -257,10 +258,10 @@ class ReelsController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print("value of coupon");
     try {
-      if (couponCodeController.value.text.isNotEmpty) {
+      if (homeController.couponCodeController.value.text.isNotEmpty) {
         isCheckOutDataLoding.value = true;
         var carts = {
-          "code": couponCodeController.value.text,
+          "code": homeController.couponCodeController.value.text,
           "total": totalMRP.value.toString(),
           "shipping_cost": "0",
           "exist_code": session.getExistingCode ?? '',
@@ -286,19 +287,18 @@ class ReelsController extends GetxController {
   }
   Future <void> buyNowFunction({int? videoID}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print("value of coupon ${productId.value}");
-    print("value of coupon ${selectSizeQty.value}");
-    print("value of coupon ${selectSize.value}");
-    print("value of coupon ${selectSizeColor.value}");
-    print("value of coupon ${selectSizeQty.value}");
-    print("value of coupon ${selectSizePrice.value}");
-    print("value of coupon ${selectSizeKey.value}");
-    print("value of coupon ${videoID.toString()}");
+    print("value of coupon id ${productId.value}");
+    print("value of coupon qty ${selectSizeQty.value}");
+    print("value of coupon size ${selectSize.value}");
+    print("value of coupon color ${selectSizeColor.value}");
+    print("value of coupon price ${selectSizePrice.value}");
+    print("value of coupon key ${selectSizeKey.value}");
+    print("value of coupon video id${videoID.toString()}");
     // try {
     //   isBuyNowLoading.value = true;
         var carts = {
             "id":productId.value,
-            "qty": selectSizeQty.value,
+            "qty": quantity.value,
             "size":selectSize.value,
             "color":selectSizeColor.value,
             "size_qty":selectSizeQty.value,
@@ -309,6 +309,7 @@ class ReelsController extends GetxController {
             "prices":"",
             "video_id": videoID.toString()
           };
+        print("this data ${carts}");
       BuyNowPassUseCase buyNowPassUseCase =
       BuyNowPassUseCase(locator<BuyNowRepository>());
         var response = await buyNowPassUseCase(carts);
@@ -355,7 +356,7 @@ class ReelsController extends GetxController {
                       child: SizedBox(
                         height: 45,
                         child: CustomTextfield(
-                          controller: fullNameController.value,
+                          controller: homeController.fullNameController.value,
                           hintText: "Full Name",
                           lebelText: "Full Name",
                           labelLeftPadding: 14,
@@ -367,7 +368,7 @@ class ReelsController extends GetxController {
                       child: SizedBox(
                         height: 45,
                         child: CustomTextfield(
-                          controller: phoneNumberController.value,
+                          controller: homeController.phoneNumberController.value,
                           hintText: "Phone Number",
                           lebelText: "Phone Number",
                           labelLeftPadding: 14,
@@ -381,7 +382,7 @@ class ReelsController extends GetxController {
                 SizedBox(
                   height: 45,
                   child: CustomTextfield(
-                    controller: detailAddressController.value,
+                    controller: homeController.detailAddressController.value,
                     hintText: "Details Address",
                     lebelText: "Details Address",
                     labelLeftPadding: 14,
@@ -468,6 +469,18 @@ class ReelsController extends GetxController {
       },
     );
   }
+  void incrementQuantity(){
+
+    quantity.value++;
+
+  update();
+  }
+  void decrementQuantity(){
+  if(quantity.value > 1){
+    quantity.value--;
+  }
+  }
+
   String? getCurrentPrice({List<String>? data}) {
     if(data?.length == 1){
       return data?[0];

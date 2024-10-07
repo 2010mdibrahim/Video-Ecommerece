@@ -733,6 +733,41 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const CustomSimpleText(
+                              text: "QUANTITY",
+                              textDecoration: TextDecoration.none,
+                              alignment: Alignment.centerLeft,
+                              textAlign: TextAlign.start,
+                            ),
+                            Row(
+                              children: [
+                                InkWell(
+                                    onTap: () {
+                                      if ((controller.quantity.value ) >
+                                          1) {
+                                        controller.decrementQuantity();
+                                      }
+                                    },
+                                    child: CustomContainer(
+                                        value:
+                                        "-")),
+                                5.pw,
+                                Obx(()=> CustomSimpleText(text: "${controller.quantity.value}"),),
+                                5.pw,
+                                InkWell(
+                                    onTap: () {
+                                      controller.incrementQuantity();
+                                    },
+                                    child: CustomContainer(
+                                        value:
+                                        "+")),
+                              ],
+                            ),
+                          ],
+                        ),
                         const CustomSimpleText(
                           text: "SIZE",
                           textDecoration: TextDecoration.none,
@@ -884,7 +919,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                       Obx(()=> controller.isBuyNowLoading.value ? const Center(child: CircularProgressIndicator(),) :  InkWell(
                         onTap: () {
                           Navigator.pop(context);
-                          controller.billingDetails(context);
+                          // controller.billingDetails(context);
                           controller.buyNowFunction(videoID: videoData?.id).then((value){
                           controller.homeController.checkOutFunction(from: "singleCheckout");
                           });
