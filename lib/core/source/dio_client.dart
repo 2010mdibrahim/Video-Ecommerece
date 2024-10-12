@@ -35,6 +35,7 @@ class DioClient {
             method: "POST",
             headers: {
               'Authorization': 'Bearer ${session.getToken}',
+              'Content-Type': 'application/json',
             },
             receiveTimeout: const Duration(milliseconds: 30000),
 

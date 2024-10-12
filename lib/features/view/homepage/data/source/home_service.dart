@@ -9,6 +9,8 @@ import '../../../../../../core/utils/constants.dart';
 import '../model/cashon_delivery_model.dart';
 import '../model/checkout_model.dart';
 import '../model/coupon_code_model.dart';
+import '../model/frient_list_model.dart';
+import '../model/my_wallet_model.dart';
 var session = locator<SessionManager>();
 
 class HomeService {
@@ -95,6 +97,43 @@ class HomeService {
       request: data,
       responseCallback: (response, message) {
         var products = CashonDeliveryModel.fromJson(response);
+        apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+
+  Future<Response<FriendListModel>?> frientList() async {
+    Response<FriendListModel>? apiResponse;
+
+    await _dioClient.get(
+      path: NetworkConfiguration.frientList,
+      responseCallback: (response, message) {
+        var products = FriendListModel.fromJson(response);
+        apiResponse = Response.success(products);
+      },
+      failureCallback: (message, status) {
+        print("this is message error $message $status");
+        apiResponse = Response.error(message, status);
+      },
+    );
+
+    logger.e("api response ${apiResponse?.data}");
+    return apiResponse;
+  }
+  Future<Response<MyWalletModel>?> myWallet() async {
+    Response<MyWalletModel>? apiResponse;
+
+    await _dioClient.get(
+      path: NetworkConfiguration.myWallet,
+      responseCallback: (response, message) {
+        var products = MyWalletModel.fromJson(response);
         apiResponse = Response.success(products);
       },
       failureCallback: (message, status) {

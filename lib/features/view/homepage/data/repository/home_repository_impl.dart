@@ -6,6 +6,8 @@ import '../model/add_by_one_model.dart';
 import '../model/cashon_delivery_model.dart';
 import '../model/checkout_model.dart';
 import '../model/coupon_code_model.dart';
+import '../model/frient_list_model.dart';
+import '../model/my_wallet_model.dart';
 import '../source/home_service.dart';
 class HomeRepositoryImpl extends HomeRepository {
   HomeRepositoryImpl(HomeService homeService) : super(homeService);
@@ -43,6 +45,18 @@ class HomeRepositoryImpl extends HomeRepository {
       {required Map<String, Object> data}) async {
     Response<CashonDeliveryModel>? apiResponse;
     apiResponse = await myVideoService.cashOnDelivery(data: data);
+    return apiResponse;
+  }
+  @override
+  Future<Response<FriendListModel>?> frientList() async {
+    Response<FriendListModel>? apiResponse;
+    apiResponse = await myVideoService.frientList();
+    return apiResponse;
+  }
+  @override
+  Future<Response<MyWalletModel>?> myWallet() async {
+    Response<MyWalletModel>? apiResponse;
+    apiResponse = await myVideoService.myWallet();
     return apiResponse;
   }
 }

@@ -8,7 +8,7 @@ import 'package:e_commerce/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:intl/intl.dart';
 import '../../../../../core/di/app_component.dart';
 import '../../../../../core/source/dio_client.dart';
 import '../../../../../core/utils/appStyle.dart';
@@ -21,6 +21,8 @@ import '../../data/model/add_to_cart_model.dart';
 import '../../data/model/cashon_delivery_model.dart';
 import '../../data/model/checkout_model.dart';
 import '../../data/model/coupon_code_model.dart';
+import '../../data/model/frient_list_model.dart';
+import '../../data/model/my_wallet_model.dart';
 import '../../domain/repository/home_repository.dart';
 import '../../domain/usecase/home_pass_usecase.dart';
 import '../widget/information_widget.dart';
@@ -32,6 +34,8 @@ mixin CheckoutController on GetxController {
   var cashOnDeliveryModel = CashonDeliveryModel().obs;
   var loginModel = LoginModel().obs;
   var isCheckOutDataLoding = false.obs;
+  var isFrientListLoading = false.obs;
+  var isWalletListLoading = false.obs;
   var isCashOnDeliveryLoading = false.obs;
   var isCouponClicked = false.obs;
   var homeAddToCartModel = HomeAddToCartModel().obs;
@@ -47,6 +51,8 @@ mixin CheckoutController on GetxController {
   var packagingSelectedValueId = 1.obs;
   var isContinueClicked = false.obs;
   var shippingDifferentAddress = false.obs;
+  var frientListModel = FriendListModel().obs;
+  var myWalletModel = MyWalletModel().obs;
   // var homeController = locator<HomeController>();
   checkOutFunction({ String? from}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -64,7 +70,7 @@ mixin CheckoutController on GetxController {
         print("checkout model ${checkoutModel.value.totalPrice}");
         print("checkout model ${checkoutModel.value.products?.the201XLe12F2F?.color}");
         billingDetails(navigatorKey.currentContext!, checkoutModel.value, from);
-        print(response?.data);
+        successToast(context: navigatorKey.currentContext!, msg: "Product successfully ordered");
       } else {
         print('No data fo-und');
       }
@@ -174,7 +180,56 @@ mixin CheckoutController on GetxController {
     //   isCashOnDeliveryLoading.value = false;
     // }
   }
-cleardata(){
+  frientListFunction() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("value of coupon");
+    try {
+      isFrientListLoading.value = true;
+      FriendListModelPassUseCase codePassUseCase =
+      FriendListModelPassUseCase(locator<HomeRepository>());
+        var response = await codePassUseCase();
+        if (response?.data != null && response?.data is FriendListModel) {
+          frientListModel.value = response?.data ?? FriendListModel();
+          print(response?.data);
+        } else {
+          ErrorDialog(navigatorKey.currentContext!, msg: "No Coupon Available");
+        }
+    } catch (e) {
+      isFrientListLoading.value = false;
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isFrientListLoading.value = false;
+    }
+    update();
+  }
+  myWalletFunction() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("value of coupon");
+    try {
+      isWalletListLoading.value = true;
+      MyWalletModelPassUseCase codePassUseCase =
+      MyWalletModelPassUseCase(locator<HomeRepository>());
+        var response = await codePassUseCase();
+        if (response?.data != null && response?.data is MyWalletModel) {
+          myWalletModel.value = response?.data ?? MyWalletModel();
+          print(response?.data);
+        } else {
+          ErrorDialog(navigatorKey.currentContext!, msg: "No History Available");
+        }
+    } catch (e) {
+      isWalletListLoading.value = false;
+      print("This is an error: ${e.toString()}");
+    } finally {
+      isWalletListLoading.value = false;
+    }
+    update();
+  }
+  String formatDate(String? updatedAt) {
+    if (updatedAt == null) return ''; // Handle null case
+    DateTime dateTime = DateTime.parse(updatedAt); // Parse to DateTime
+    return DateFormat('yyyy-MM-dd').format(dateTime); // Format as 'yyyy-MM-dd'
+  }
+  cleardata(){
   fullNameController.value.clear();
   phoneNumberController.value.clear();
   detailAddressController.value.clear();

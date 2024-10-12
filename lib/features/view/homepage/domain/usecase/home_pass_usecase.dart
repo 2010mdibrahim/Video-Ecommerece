@@ -4,6 +4,8 @@ import '../../data/model/add_to_cart_model.dart';
 import '../../data/model/cashon_delivery_model.dart';
 import '../../data/model/checkout_model.dart';
 import '../../data/model/coupon_code_model.dart';
+import '../../data/model/frient_list_model.dart';
+import '../../data/model/my_wallet_model.dart';
 import 'home_usecase.dart';
 
 class HomePassUseCase extends HomeUseCase {
@@ -43,6 +45,22 @@ class CashOnDeliveryPassUseCase extends HomeUseCase {
 
   Future<Response<CashonDeliveryModel>?> call({required Map<String, Object> data}) async {
     var response = await homeRepository.cashOnDelivery(data: data);
+    return response;
+  }
+}
+class FriendListModelPassUseCase extends HomeUseCase {
+  FriendListModelPassUseCase(super.homeRepository);
+
+  Future<Response<FriendListModel>?> call() async {
+    var response = await homeRepository.frientList();
+    return response;
+  }
+}
+class MyWalletModelPassUseCase extends HomeUseCase {
+  MyWalletModelPassUseCase(super.homeRepository);
+
+  Future<Response<MyWalletModel>?> call() async {
+    var response = await homeRepository.myWallet();
     return response;
   }
 }

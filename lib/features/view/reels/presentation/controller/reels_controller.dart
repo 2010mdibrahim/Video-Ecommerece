@@ -47,7 +47,7 @@ class ReelsController extends GetxController {
   var price = 100.obs;
   var priceSum = 0.obs;
   var totalMRP = 0.obs;
-  var quantity = 0.obs;
+  var quantity = 1.obs;
   // var fullNameController = TextEditingController().obs;
   // var phoneNumberController = TextEditingController().obs;
   // var detailAddressController = TextEditingController().obs;
@@ -296,18 +296,32 @@ class ReelsController extends GetxController {
     print("value of coupon video id${videoID.toString()}");
     // try {
     //   isBuyNowLoading.value = true;
-        var carts = {
-            "id":productId.value,
-            "qty": quantity.value,
-            "size":selectSize.value,
-            "color":selectSizeColor.value,
-            "size_qty":selectSizeQty.value,
-            "size_price": selectSizePrice.value,
-            "size_key":selectSizeKey.value,
+    var carts = {
+      "id": productId.value.toString(),
+      "qty": quantity.value.toString(),
+      "size": selectSize.value.toString(),
+      "color": selectSizeColor.value.isEmpty ? "" : selectSizeColor.value.toString(),
+      "size_qty": selectSizeQty.value.toString(),
+      "size_price": selectSizePrice.value.toString(),
+      "size_key": selectSizeKey.value.toString(),
+      "keys": "",
+      "values": "",
+      "prices": "",
+      "video_id": videoID.toString()
+    };
+
+        var cartss = {
+            "id": "200" ,
+            "qty": "1",
+            "size": "M",
+            "color":"",
+            "size_qty":"1",
+            "size_price": "300",
+            "size_key":"1",
             "keys":"",
             "values":"",
             "prices":"",
-            "video_id": videoID.toString()
+            "video_id": "14"
           };
         print("this data ${carts}");
       BuyNowPassUseCase buyNowPassUseCase =

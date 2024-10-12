@@ -111,6 +111,7 @@ class Homepage extends StatelessWidget {
                       titleColor: HexColor("8C632A"),
                       onPress: () {
                         RouteGenerator.pushNamed(context, Routes.wallet);
+                        homeController.myWalletFunction();
                       },
                     ),
                   ),
@@ -155,13 +156,6 @@ class Homepage extends StatelessWidget {
                         borderRadius: BorderRadius.only(
                             topRight: Radius.circular(5),
                             topLeft: Radius.circular(5)),
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.black26,
-                        //     blurRadius: 8,
-                        //     offset: Offset(0, 2),
-                        //   ),
-                        // ],
                       ),
                       child: CalendarScreen()),
                   Container(
@@ -206,10 +200,16 @@ class Homepage extends StatelessWidget {
                   ),
                   20.pw,
                   Expanded(
-                    child: CustomRow(
-                      title: "My Friend",
-                      icon: AppAssets.myFriends,
-                      titleColor: HexColor("B1483B"),
+                    child: InkWell(
+                      onTap: (){
+                        RouteGenerator.pushNamed(context, Routes.friend);
+                        homeController.frientListFunction();
+                      },
+                      child: CustomRow(
+                        title: "My Friend",
+                        icon: AppAssets.myFriends,
+                        titleColor: HexColor("B1483B"),
+                      ),
                     ),
                   ),
                 ],

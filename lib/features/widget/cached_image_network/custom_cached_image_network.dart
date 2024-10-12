@@ -19,11 +19,12 @@ class CustomCachedImageNetwork extends StatelessWidget {
               image: imageProvider,
               fit: boxfit ?? BoxFit.fill,
               colorFilter:
-              ColorFilter.mode(Colors.white, BlendMode.colorBurn)),
+              ColorFilter.mode(Colors.white, BlendMode.colorBurn),
+          ),
         ),
       ),
       placeholder: (context, url) => CircularProgressIndicator(),
-      errorWidget: (context, url, error) => Icon(Icons.error),
+      errorWidget: (context, url, error) => Icon(Icons.person, size: 50,),
     );
   }
 }

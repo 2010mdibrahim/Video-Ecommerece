@@ -7,12 +7,14 @@ import 'package:e_commerce/core/utils/app_assets.dart';
 import 'package:e_commerce/features/view/reels/data/model/reels_model.dart';
 import 'package:e_commerce/features/view/reels/presentation/controller/reels_controller.dart';
 import 'package:e_commerce/features/widget/custom_richtext/custom_richtext.dart';
+import 'package:e_commerce/features/widget/custom_toast/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../../core/model/dropdown_model.dart';
 import '../../../../../core/network/configuration.dart';
@@ -47,6 +49,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     WidgetsBinding.instance.addObserver(this);
     if (controller.reelsModel.value.data?.isNotEmpty == true) {
       print("");
@@ -58,11 +61,11 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
               0); // maxLength ensures it's positive
       controller.indexFromMyVideo.value = randomNumber;
       final initialUrl =
-          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value].videoUrl ?? ''}";
+          "http://erp.mahfuza-overseas.com/trending-house/${controller.reelsModel.value.data?[controller.indexFromMyVideo.value ?? 1].videoUrl ?? ''}";
       _initController(
           initialUrl,
           controller
-              .reelsModel.value.data?[controller.indexFromMyVideo.value].id,
+              .reelsModel.value.data?[controller.indexFromMyVideo.value ?? 1 ].id,
           controller
               .reelsModel.value.data
       );
@@ -164,6 +167,7 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     _hideControlsTimer?.cancel();
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -237,8 +241,22 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                   actions: [
                     PopupMenuButton<DropdownModel>(
                       icon: const Icon(Icons.menu, color: Colors.white),
-                      onSelected: (DropdownModel selectedValue) {
-                        controller.selectMenu(selectedValue);
+                      onSelected: (DropdownModel selectedValue) async {
+                        await _controller?.dispose();
+
+                        // Get the selected video ID and URL
+                        int selectedVideoId = selectedValue.id; // Assume DropdownModel has an 'id' property
+                        String selectedVideoUrl = controller.reelsModel.value.data?.firstWhere(
+                        (video) => video.id == selectedVideoId,
+                        orElse: () => Data(),
+                        )?.videoUrl ?? ''; // Fetch the video URL based on the selected ID
+
+                        // Check if the selected video URL is valid
+                        if (selectedVideoUrl.isNotEmpty) {
+                        await _initController(selectedVideoUrl, selectedVideoId, controller.reelsModel.value.data);
+                        } else {
+                        print("Selected video URL is empty");
+                        }
                       },
                       itemBuilder: (BuildContext context) {
                         return [
@@ -768,14 +786,69 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                             ),
                           ],
                         ),
-                        const CustomSimpleText(
+                        (videoData?.size == null) ? SizedBox(
+                          height: 30,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: videoData?.size?.length ?? 0,
+                            itemBuilder: (_, index) {
+                              String item = videoData?.size?[index] ?? '';
+                              return Obx(() => Row(
+                                children: [
+                                  Radio<String>(
+                                    value: item,
+                                    groupValue: controller.selectSize
+                                        .value, // Make sure this is RxString
+                                    onChanged: (String? value) {
+                                      controller.selectSize.value = value!;
+                                      controller.selectSizeId.value =
+                                      index!;
+                                      controller.selectSizePrice.value =
+                                          controller.getCurrentPrice(
+                                              data: videoData
+                                                  ?.sizePrice) ??
+                                              '';
+                                      controller.selectSizeColor.value =
+                                          controller.getCurrentColor(
+                                              data: videoData?.color) ??
+                                              '';
+                                      controller.selectSizeQty.value =
+                                          controller.getCurrentColor(
+                                              data:
+                                              videoData?.sizeQty) ??
+                                              '';
+                                      controller.selectSizeKey.value =
+                                          index.toString();
+                                      controller.totalMRP.value = int.parse(
+                                          controller.getCurrentPrice(
+                                              data: videoData
+                                                  ?.sizePrice) ??
+                                              '');
+                                      print(
+                                          "Selected size: ${controller.selectSize.value} ${controller.selectSizeColor.value} ${controller.selectSizeQty.value}");
+                                    },
+                                  ),
+                                  CustomSimpleText(
+                                    text: item, // "XL", "M", etc.
+                                    textDecoration: TextDecoration.none,
+                                    alignment: Alignment.center,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ));
+                            },
+                          ),
+                        ) :  const CustomSimpleText(
                           text: "SIZE",
                           textDecoration: TextDecoration.none,
                           alignment: Alignment.centerLeft,
                           textAlign: TextAlign.start,
                         ),
                         // Wrap ListView.builder in SizedBox to give it a fixed height
-                        SizedBox(
+                        (videoData?.size == null) ?  SizedBox.shrink() : SizedBox(
                           height: 30,
                           width: MediaQuery.of(context).size.width,
                           child: ListView.builder(
@@ -830,18 +903,18 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                   ));
                             },
                           ),
-                        ),
-                        Obx(
+                        ) ,
+                        (controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)? SizedBox.shrink() :  Obx(
                           () => CustomSimpleText(
                               text:
                                   "Price: ${controller.getCurrentPrice(data: videoData?.sizePrice)}"),
                         ),
-                        Obx(
+                        (controller.getCurrentQty(data: videoData?.sizeQty)?.isEmpty ?? false) ? SizedBox.shrink(): Obx(
                           () => CustomSimpleText(
                               text:
                                   "Quantity: ${controller.getCurrentQty(data: videoData?.sizeQty)}"),
                         ),
-                        SizedBox(
+                         SizedBox(
                           height: 30,
                           width: MediaQuery.of(context).size.width,
                           child: ListView.builder(
@@ -860,7 +933,8 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                     child: Center(
                                       child: Align(
                                         alignment: Alignment.centerLeft,
-                                        child: Obx(() => Container(
+                                        child: controller.selectSizeColor
+                                            .value.isEmpty ? SizedBox.shrink() : Obx(() => Container(
                                               height: 20,
                                               width: 20,
                                               decoration: BoxDecoration(
@@ -886,21 +960,21 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                                 );
                               }),
                         ),
-                        CustomSimpleText(
+                        (controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)? SizedBox.shrink() :  CustomSimpleText(
                           text: "Price Details",
                           fontWeight: FontWeight.bold,
                           fontSize: AppSizes.size16,
                           color: AppColors.black,
                         ),
-                        Obx(
+                        (controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)? SizedBox.shrink() :  Obx(
                           () => CustomRow(
                             title: "Total MRP",
                             price:
                                 "৳${int.parse(controller.getCurrentPrice(data: videoData?.sizePrice) ?? '')}",
                           ),
                         ),
-                        Divider(color: AppColors.backgroundColor),
-                        Obx(
+                        (controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)? SizedBox.shrink() : Divider(color: AppColors.backgroundColor),
+                        (controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)? SizedBox.shrink() :     Obx(
                           () => CustomRow(
                             title: "Total ",
                             price:
@@ -918,11 +992,19 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
                         10.ph,
                       Obx(()=> controller.isBuyNowLoading.value ? const Center(child: CircularProgressIndicator(),) :  InkWell(
                         onTap: () {
-                          Navigator.pop(context);
-                          // controller.billingDetails(context);
-                          controller.buyNowFunction(videoID: videoData?.id).then((value){
-                          controller.homeController.checkOutFunction(from: "singleCheckout");
-                          });
+                          if((controller.getCurrentPrice(data: videoData?.sizePrice)?.isEmpty ?? false)){
+                            errorToast(context: context, msg: "Some information missing");
+                          }else if((videoData?.color == null)){
+                            errorToast(context: context, msg: "Some information missing");
+                          }else if( (controller.getCurrentQty(data: videoData?.sizeQty)?.isEmpty ?? false)){
+                            errorToast(context: context, msg: "Some information missing");
+                          }else{
+                            Navigator.pop(context);
+                            // controller.billingDetails(context);
+                            controller.buyNowFunction(videoID: videoData?.id).then((value){
+                              controller.homeController.checkOutFunction(from: "singleCheckout");
+                            });
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),

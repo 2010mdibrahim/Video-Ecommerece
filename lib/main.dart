@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: "Video Ecommerce",
+      title: "VideoMart",
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       // theme: ThemeData(

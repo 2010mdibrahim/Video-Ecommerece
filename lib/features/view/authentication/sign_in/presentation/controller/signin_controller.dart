@@ -12,8 +12,8 @@ import '../../domain/usecase/login_with_id_pass_usecase.dart';
 
 class SigninController extends GetxController {
   var obscureText = false.obs;
-  var emailController = TextEditingController(text: "arif@gmail.com").obs;
-  var passwordController = TextEditingController(text: "12345678").obs;
+  var emailController = TextEditingController().obs;
+  var passwordController = TextEditingController().obs;
   var passwordVisibility = true.obs;
   var errorMessage = ''.obs;
   var isLoading = false.obs;

@@ -100,7 +100,7 @@ class ReelsService {
   }
   Future<Response<BuyNowModel>?> buyNow(Map<String, Object> data) async {
     Response<BuyNowModel>? apiResponse;
-
+print("service $data");
     await _dioClient.post(
       path: NetworkConfiguration.buyNow,
       request: data,
